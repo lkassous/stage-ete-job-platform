@@ -86,6 +86,14 @@
                                 Se connecter
                             </button>
                         </div>
+
+                        <!-- Lien mot de passe oublié -->
+                        <div style="text-align: center; margin-top: 1rem;">
+                            <a href="#" id="forgotPasswordLink" style="color: var(--primary-600); text-decoration: none; font-size: 0.875rem;">
+                                <i class="fas fa-key"></i>
+                                Mot de passe oublié ?
+                            </a>
+                        </div>
                     </form>
 
                     <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
@@ -116,6 +124,78 @@
     <!-- Notifications -->
     <div id="notification" class="notification" style="display: none;">
         <div id="notification-content"></div>
+    </div>
+
+    <!-- Modal pour demander l'email -->
+    <div id="forgotPasswordModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Mot de passe oublié</h3>
+                <button class="modal-close" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Saisissez votre adresse email pour recevoir un code de réinitialisation :</p>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="resetEmail">Adresse email</label>
+                        <input type="email" id="resetEmail" name="email" class="form-input" placeholder="votre@email.com" required>
+                        <div class="field-error" id="resetEmail-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-paper-plane"></i>
+                            Envoyer le code
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour saisir le code et nouveau mot de passe -->
+    <div id="resetPasswordModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-lock"></i> Réinitialiser le mot de passe</h3>
+                <button class="modal-close" onclick="closeResetPasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Saisissez le code reçu par email et votre nouveau mot de passe :</p>
+                <form id="resetPasswordForm">
+                    <div class="form-group">
+                        <label for="verificationCode">Code de vérification (6 chiffres)</label>
+                        <input type="text" id="verificationCode" name="code" class="form-input" placeholder="123456" maxlength="6" required>
+                        <div class="field-error" id="verificationCode-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Nouveau mot de passe</label>
+                        <div class="password-field">
+                            <input type="password" id="newPassword" name="password" class="form-input" placeholder="Nouveau mot de passe" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-error" id="newPassword-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer le mot de passe</label>
+                        <div class="password-field">
+                            <input type="password" id="confirmPassword" name="password_confirmation" class="form-input" placeholder="Confirmer le mot de passe" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-error" id="confirmPassword-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-check"></i>
+                            Réinitialiser le mot de passe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
@@ -306,6 +386,152 @@
         }
 
         // Note: TokenManager et UserManager sont définis dans app.js
+
+        // ===== GESTION DU MOT DE PASSE OUBLIÉ =====
+        let currentResetEmail = '';
+
+        // Fonction pour effacer les erreurs des champs
+        function clearFieldErrors() {
+            const errorElements = document.querySelectorAll('.field-error');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+                element.textContent = '';
+            });
+        }
+
+        // Ouvrir le modal de demande d'email
+        document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('forgotPasswordModal').style.display = 'flex';
+        });
+
+        // Fermer les modals
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+            document.getElementById('forgotPasswordForm').reset();
+            clearFieldErrors();
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').style.display = 'none';
+            document.getElementById('resetPasswordForm').reset();
+            clearFieldErrors();
+        }
+
+        // Fermer les modals en cliquant à l'extérieur
+        document.getElementById('forgotPasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeForgotPasswordModal();
+            }
+        });
+
+        document.getElementById('resetPasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResetPasswordModal();
+            }
+        });
+
+        // Gestion du formulaire de demande de code
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            currentResetEmail = email;
+
+            try {
+                const response = await fetch('/api/auth/password/send-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                console.log('Response status:', response.status);
+                console.log('Response data:', data);
+
+                if (response.ok && data.success) {
+                    showNotification('Code envoyé ! Vérifiez votre boîte email.', 'success');
+                    closeForgotPasswordModal();
+                    document.getElementById('resetPasswordModal').style.display = 'flex';
+                } else {
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            showFieldError(field === 'email' ? 'resetEmail' : field, data.errors[field][0]);
+                        });
+                    } else {
+                        showNotification(data.message || 'Erreur lors de l\'envoi du code', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de connexion au serveur', 'error');
+            }
+        });
+
+        // Gestion du formulaire de réinitialisation
+        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const resetData = {
+                email: currentResetEmail,
+                code: formData.get('code'),
+                password: formData.get('password'),
+                password_confirmation: formData.get('password_confirmation')
+            };
+
+            try {
+                const response = await fetch('/api/auth/password/reset-with-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(resetData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.', 'success');
+                    closeResetPasswordModal();
+                    currentResetEmail = '';
+                } else {
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            let fieldId = field;
+                            if (field === 'code') fieldId = 'verificationCode';
+                            if (field === 'password') fieldId = 'newPassword';
+                            if (field === 'password_confirmation') fieldId = 'confirmPassword';
+                            showFieldError(fieldId, data.errors[field][0]);
+                        });
+                    } else {
+                        showNotification(data.message || 'Erreur lors de la réinitialisation', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de connexion au serveur', 'error');
+            }
+        });
+
+        // Validation en temps réel du code (6 chiffres seulement)
+        document.getElementById('verificationCode').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Supprimer tout ce qui n'est pas un chiffre
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            e.target.value = value;
+        });
     </script>
 </body>
 </html>

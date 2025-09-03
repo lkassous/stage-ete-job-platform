@@ -60,6 +60,14 @@ Route::prefix('auth')->name('api.auth.')->group(function () {
         ->name('password.reset');
     Route::post('password/verify-token', [App\Http\Controllers\Auth\PasswordResetController::class, 'verifyToken'])
         ->name('password.verify');
+
+    // Routes de récupération de mot de passe avec code
+    Route::post('password/send-code', [App\Http\Controllers\Auth\PasswordResetCodeController::class, 'sendResetCode'])
+        ->name('password.send-code');
+    Route::post('password/verify-code', [App\Http\Controllers\Auth\PasswordResetCodeController::class, 'verifyCode'])
+        ->name('password.verify-code');
+    Route::post('password/reset-with-code', [App\Http\Controllers\Auth\PasswordResetCodeController::class, 'resetPasswordWithCode'])
+        ->name('password.reset-with-code');
 });
 
 /*
