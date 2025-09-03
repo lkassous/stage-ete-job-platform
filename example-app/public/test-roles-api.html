@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Rôles</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de l'API des Rôles</h1>
+    
+    <button onclick="testRolesAPI()">🔄 Tester l'API /api/public/roles</button>
+    <button onclick="testWithFetch()">📡 Test avec Fetch</button>
+    <button onclick="clearResults()">🗑️ Effacer</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function addResult(title, content, type = 'result') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${content}</pre>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testRolesAPI() {
+            addResult('🔄 Test en cours...', 'Appel de l\'API /api/public/roles');
+            
+            try {
+                const response = await fetch('/api/public/roles', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                addResult(
+                    `📡 Réponse HTTP: ${response.status} ${response.statusText}`,
+                    `URL: ${response.url}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers), null, 2)}`
+                );
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    addResult(
+                        '✅ Réponse JSON reçue',
+                        JSON.stringify(result, null, 2),
+                        'success'
+                    );
+
+                    if (result.success && result.data) {
+                        addResult(
+                            `🎯 ${result.data.length} rôles trouvés`,
+                            result.data.map(role => `• ${role.name} - ${role.display_name} (${role.is_active ? 'actif' : 'inactif'})`).join('\n'),
+                            'success'
+                        );
+
+                        // Test de création du select
+                        testSelectCreation(result.data);
+                    }
+                } else {
+                    const errorText = await response.text();
+                    addResult(
+                        '❌ Erreur HTTP',
+                        `Status: ${response.status}\nResponse: ${errorText}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                addResult(
+                    '❌ Erreur JavaScript',
+                    `Message: ${error.message}\nStack: ${error.stack}`,
+                    'error'
+                );
+            }
+        }
+
+        function testSelectCreation(roles) {
+            // Créer un select de test
+            const testSelect = document.createElement('select');
+            testSelect.id = 'test-role-select';
+            testSelect.innerHTML = '<option value="">Sélectionnez votre rôle</option>';
+
+            const roleIcons = {
+                'super_admin': '👑',
+                'admin': '🔧',
+                'hr_director': '🎯',
+                'hr_manager': '👥',
+                'senior_recruiter': '⭐',
+                'recruiter': '🎯',
+                'junior_recruiter': '🌟',
+                'analyst': '📊',
+                'viewer': '👁️'
+            };
+
+            let addedOptions = 0;
+            roles.forEach(role => {
+                if (role.is_active) {
+                    const option = document.createElement('option');
+                    option.value = role.name;
+                    const icon = roleIcons[role.name] || '👤';
+                    option.textContent = `${icon} ${role.display_name}`;
+                    option.title = role.description || '';
+                    testSelect.appendChild(option);
+                    addedOptions++;
+                }
+            });
+
+            addResult(
+                `🎨 Select créé avec ${addedOptions} options`,
+                `HTML généré:\n${testSelect.outerHTML}`,
+                'success'
+            );
+
+            // Ajouter le select à la page pour test visuel
+            const container = document.createElement('div');
+            container.innerHTML = '<h4>🎯 Select de test:</h4>';
+            container.appendChild(testSelect);
+            document.getElementById('results').appendChild(container);
+        }
+
+        async function testWithFetch() {
+            addResult('🔄 Test simple avec fetch...', 'Test basique de l\'API');
+            
+            fetch('/api/public/roles')
+                .then(response => {
+                    addResult('📡 Réponse reçue', `Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    addResult('✅ JSON parsé', JSON.stringify(data, null, 2), 'success');
+                })
+                .catch(error => {
+                    addResult('❌ Erreur', error.message, 'error');
+                });
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('DOMContentLoaded', function() {
+            addResult('🚀 Page chargée', 'Tests disponibles ci-dessus');
+        });
+    </script>
+</body>
+</html>

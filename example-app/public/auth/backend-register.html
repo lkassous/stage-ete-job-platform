@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription Backend - CV Filtering System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="filament-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>CV Filtering System - Backend</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="backend-login.html" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Connexion
+                </a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>
+                        <i class="fas fa-user-shield"></i>
+                        Inscription Utilisateur Backend
+                    </h2>
+                    <p>Créer un compte administrateur, RH ou recruteur</p>
+                </div>
+
+                <form id="backendRegisterForm" class="auth-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-user"></i> Prénom
+                            </label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                class="form-input" 
+                                placeholder="Votre prénom"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-user"></i> Nom
+                            </label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name" 
+                                class="form-input" 
+                                placeholder="Votre nom de famille"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Adresse email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="votre.email@entreprise.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone"></i> Téléphone
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                class="form-input" 
+                                placeholder="+33 1 23 45 67 89"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="linkedin_url" class="form-label">
+                                <i class="fab fa-linkedin"></i> LinkedIn (optionnel)
+                            </label>
+                            <input 
+                                type="url" 
+                                id="linkedin_url" 
+                                name="linkedin_url" 
+                                class="form-input" 
+                                placeholder="https://linkedin.com/in/votre-profil"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role_name" class="form-label">
+                            <i class="fas fa-user-tag"></i> Rôle
+                        </label>
+                        <select id="role_name" name="role_name" class="form-select" required>
+                            <option value="">Sélectionnez votre rôle</option>
+                            <option value="admin">👑 Administrateur</option>
+                            <option value="hr_manager">👥 Responsable RH</option>
+                            <option value="recruiter">🎯 Recruteur</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Mot de passe
+                        </label>
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input" 
+                                placeholder="Minimum 8 caractères"
+                                required
+                            >
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength" id="passwordStrength"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmation" class="form-label">
+                            <i class="fas fa-lock"></i> Confirmer le mot de passe
+                        </label>
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="password_confirmation" 
+                                name="password_confirmation" 
+                                class="form-input" 
+                                placeholder="Répétez votre mot de passe"
+                                required
+                            >
+                            <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn btn-primary btn-full">
+                            <i class="fas fa-user-shield"></i>
+                            Créer le compte backend
+                        </button>
+                    </div>
+                </form>
+
+                <div class="form-footer">
+                    <p>Vous avez déjà un compte ? 
+                        <a href="backend-login.html" class="link-primary">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Response Display -->
+                <div id="responseContainer" class="response-container" style="display: none;">
+                    <div class="response-header">
+                        <h4><i class="fas fa-server"></i> Réponse de l'API</h4>
+                    </div>
+                    <pre id="responseContent"></pre>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 CV Filtering System - Interface Backend. Accès réservé aux administrateurs.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeBackendRegisterForm();
+        });
+
+        function initializeBackendRegisterForm() {
+            const form = document.getElementById('backendRegisterForm');
+            const passwordInput = document.getElementById('password');
+            
+            // Validation en temps réel du mot de passe
+            passwordInput.addEventListener('input', checkPasswordStrength);
+            
+            // Soumission du formulaire
+            form.addEventListener('submit', handleBackendRegisterSubmit);
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthContainer = document.getElementById('passwordStrength');
+            
+            let strength = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) strength++;
+            else feedback.push('Au moins 8 caractères');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('Une majuscule');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('Une minuscule');
+            
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('Un chiffre');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('Un caractère spécial');
+            
+            const levels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+            const colors = ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#16a34a'];
+            
+            strengthContainer.innerHTML = `
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: ${(strength / 5) * 100}%; background: ${colors[strength - 1] || colors[0]}"></div>
+                </div>
+                <div class="strength-text" style="color: ${colors[strength - 1] || colors[0]}">
+                    ${levels[strength - 1] || levels[0]}
+                    ${feedback.length > 0 ? ` - Manque: ${feedback.join(', ')}` : ''}
+                </div>
+            `;
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.parentNode.querySelector('.password-toggle i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                button.className = 'fas fa-eye-slash';
+            } else {
+                field.type = 'password';
+                button.className = 'fas fa-eye';
+            }
+        }
+
+        async function handleBackendRegisterSubmit(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const form = event.target;
+            
+            // Nettoyer les erreurs précédentes
+            FormManager.clearAllErrors(form);
+            
+            // Récupérer les données du formulaire
+            const formData = new FormData(form);
+            const userData = Object.fromEntries(formData.entries());
+            
+            // Validation côté client
+            if (!validateBackendRegisterForm(userData)) {
+                return;
+            }
+            
+            try {
+                LoadingManager.show(submitBtn, 'Création du compte...');
+                
+                // Utiliser l'endpoint backend
+                const response = await fetch('/api/backend/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                
+                displayResponse({ success: response.ok, data: result });
+                
+                if (response.ok && result.success) {
+                    NotificationManager.show('Compte backend créé avec succès !', 'success');
+                    
+                    // Redirection vers la page de connexion après 2 secondes
+                    setTimeout(() => {
+                        window.location.href = 'backend-login.html';
+                    }, 2000);
+                } else {
+                    NotificationManager.show(
+                        result.message || 'Erreur lors de la création du compte', 
+                        'error'
+                    );
+                    
+                    // Afficher les erreurs de validation
+                    if (result.errors) {
+                        Object.keys(result.errors).forEach(field => {
+                            FormManager.showFieldError(field, result.errors[field][0]);
+                        });
+                    }
+                }
+            } catch (error) {
+                NotificationManager.show(`Erreur: ${error.message}`, 'error');
+                displayResponse({ success: false, error: error.message });
+            } finally {
+                LoadingManager.hide(submitBtn);
+            }
+        }
+
+        function validateBackendRegisterForm(userData) {
+            let isValid = true;
+            
+            // Validation du prénom
+            if (!FormManager.validateRequired(userData.first_name)) {
+                FormManager.showFieldError('first_name', 'Le prénom est requis');
+                isValid = false;
+            }
+            
+            // Validation du nom
+            if (!FormManager.validateRequired(userData.last_name)) {
+                FormManager.showFieldError('last_name', 'Le nom est requis');
+                isValid = false;
+            }
+            
+            // Validation de l'email
+            if (!FormManager.validateRequired(userData.email)) {
+                FormManager.showFieldError('email', 'L\'email est requis');
+                isValid = false;
+            } else if (!FormManager.validateEmail(userData.email)) {
+                FormManager.showFieldError('email', 'Format d\'email invalide');
+                isValid = false;
+            }
+            
+            // Validation du mot de passe
+            if (!FormManager.validateRequired(userData.password)) {
+                FormManager.showFieldError('password', 'Le mot de passe est requis');
+                isValid = false;
+            } else if (!FormManager.validatePassword(userData.password)) {
+                FormManager.showFieldError('password', 'Le mot de passe doit contenir au moins 8 caractères');
+                isValid = false;
+            }
+            
+            // Validation de la confirmation
+            if (userData.password !== userData.password_confirmation) {
+                FormManager.showFieldError('password_confirmation', 'Les mots de passe ne correspondent pas');
+                isValid = false;
+            }
+            
+            // Validation du rôle
+            if (!FormManager.validateRequired(userData.role_name)) {
+                FormManager.showFieldError('role_name', 'Veuillez sélectionner un rôle');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function displayResponse(result) {
+            const container = document.getElementById('responseContainer');
+            const content = document.getElementById('responseContent');
+            
+            container.style.display = 'block';
+            container.className = `response-container ${result.success ? 'response-success' : 'response-error'}`;
+            content.textContent = JSON.stringify(result.data || result, null, 2);
+        }
+    </script>
+</body>
+</html>

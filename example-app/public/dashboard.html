@@ -1,0 +1,3568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="auth/filament-style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .welcome-section p {
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.primary { background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); }
+        .stat-icon.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-icon.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin: 0.25rem 0 0 0;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .stat-change.positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .stat-change.negative {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-50);
+            border-color: var(--primary-200);
+            color: var(--primary-700);
+            transform: translateY(-1px);
+        }
+
+        .action-btn i {
+            font-size: 1.25rem;
+        }
+
+        .cv-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .cv-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .cv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .candidate-info h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .candidate-info p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-processing { background: #dbeafe; color: #1e40af; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+
+        .ai-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .score-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .score-excellent { background: #10b981; }
+        .score-good { background: #3b82f6; }
+        .score-average { background: #f59e0b; }
+        .score-poor { background: #ef4444; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .analysis-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--gray-900);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
+            background: var(--primary-100);
+            color: var(--primary-700);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .recent-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-700);
+        }
+
+        .recent-info h4 {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .recent-info p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Styles pour les tableaux de données */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .data-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Styles pour les badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-primary {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .badge-emploi {
+            background: #e0f2fe;
+            color: #01579b;
+        }
+
+        .badge-stage {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        /* Styles pour la pagination */
+        .pagination-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination-info {
+            margin-bottom: 15px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+        }
+
+        /* Styles pour les inputs de recherche */
+        .form-input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Styles pour les contrôles d'en-tête */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Styles pour les informations utilisateur/candidat */
+        .candidate-info,
+        .user-info {
+            line-height: 1.4;
+        }
+
+        .linkedin-link {
+            color: #0077b5;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .linkedin-link:hover {
+            text-decoration: underline;
+        }
+
+        .role-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .text-muted {
+            color: var(--gray-500);
+        }
+
+        /* Messages d'état */
+        .no-data,
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-500);
+            font-style: italic;
+        }
+
+        .error {
+            color: var(--danger-color);
+            background: #fee2e2;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Styles pour les détails */
+        .details-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .details-section h3 {
+            margin: 0 0 1rem 0;
+            color: var(--gray-700);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: var(--gray-900);
+            font-size: 0.95rem;
+        }
+
+        .file-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-link:hover {
+            text-decoration: underline;
+        }
+
+        .permission-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .permission-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="header-logo">
+                <i class="fas fa-robot"></i>
+                AI-Powered CV Filtering System
+            </a>
+            <nav class="header-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+                <a href="auth/profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profil
+                </a>
+                <button onclick="logout()" class="nav-link" style="background: none; border: none; cursor: pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Déconnexion
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1>🎯 Dashboard Admin - CV Filtering System</h1>
+                <p>Bienvenue, <span id="userName">Utilisateur</span> - <span id="userRole">Chargement...</span></p>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">
+                    Interface d'administration pour la gestion des candidatures et analyses IA
+                </p>
+
+            </div>
+            <div class="header-actions">
+                <button onclick="refreshDashboard()" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                    Actualiser
+                </button>
+                <a href="/admin" class="btn btn-primary" style="margin-left: 0.5rem; text-decoration: none;">
+                    <i class="fas fa-cogs"></i>
+                    Filament Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-change positive" id="candidatesGrowth">+12%</div>
+                </div>
+                <h3 class="stat-value" id="totalCandidates">
+                    <span class="loading-spinner"></span>
+                </h3>
+                <p class="stat-label">CVs soumis</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon success">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="stat-change positive" id="analysesGrowth">+8%</div>
+                </div>
+                <h3 class="stat-value" id="analyzedCandidates">
+                    <span class="loading-spinner"></span>
+                </h3>
+                <p class="stat-label">Analyses IA terminées</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-change" id="pendingGrowth">+3</div>
+                </div>
+                <h3 class="stat-value" id="pendingAnalyses">
+                    <span class="loading-spinner"></span>
+                </h3>
+                <p class="stat-label">En attente d'analyse</p>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon info">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-change positive" id="matchGrowth">+15%</div>
+                </div>
+                <h3 class="stat-value" id="averageScore">
+                    <span class="loading-spinner"></span>
+                </h3>
+                <p class="stat-label">Score moyen IA</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Admin Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">⚡ Actions administrateur</h2>
+                    </div>
+                    <div class="quick-actions">
+                        <div class="action-btn" onclick="showCandidatesManagement()">
+                            <i class="fas fa-users"></i>
+                            <span>Gérer les candidats</span>
+                        </div>
+                        <div class="action-btn" onclick="showUsersManagement()">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Gérer les utilisateurs</span>
+                        </div>
+                        <div class="action-btn" onclick="triggerAIAnalysis()">
+                            <i class="fas fa-robot"></i>
+                            <span>Analyser avec IA</span>
+                        </div>
+                        <div class="action-btn" onclick="showReports()">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Rapports & Statistiques</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion des Candidats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">👥 Gestion des Candidats</h2>
+                        <div class="header-controls" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <input type="text" id="candidateSearch" placeholder="🔍 Rechercher..."
+                                   onkeyup="debounceSearch()" class="form-input" style="min-width: 200px;">
+
+                            <select id="candidateStatusFilter" onchange="applyCandidateFilters()" class="form-select">
+                                <option value="all">Tous les statuts</option>
+                                <option value="pending">En attente</option>
+                                <option value="reviewed">Examiné</option>
+                                <option value="accepted">Accepté</option>
+                                <option value="rejected">Rejeté</option>
+                            </select>
+
+                            <select id="jobOfferFilter" onchange="applyCandidateFilters()" class="form-select">
+                                <option value="all">Toutes les offres</option>
+                            </select>
+
+                            <select id="candidatesPerPage" onchange="changeCandidatesPerPage()" class="form-select">
+                                <option value="5" selected>5/page</option>
+                                <option value="10">10/page</option>
+                                <option value="25">25/page</option>
+                                <option value="50">50/page</option>
+                            </select>
+
+                            <button onclick="loadCandidates(1)" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+
+                            <button onclick="exportCandidates()" class="btn btn-success btn-sm">
+                                <i class="fas fa-download"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    <div id="candidatesTable" class="table-container">
+                        <div class="loading">Chargement des candidats...</div>
+                    </div>
+                </div>
+
+                <!-- Gestion des Offres d'Emploi -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">💼 Gestion des Offres d'Emploi</h2>
+                        <div class="header-controls" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <select id="offerTypeFilter" onchange="applyOfferFilters()" class="form-select">
+                                <option value="all">Tous les types</option>
+                                <option value="emploi">💼 Emploi</option>
+                                <option value="stage">🎓 Stage</option>
+                            </select>
+
+                            <select id="offerStatusFilter" onchange="applyOfferFilters()" class="form-select">
+                                <option value="all">Tous les statuts</option>
+                                <option value="active">🟢 Actives</option>
+                                <option value="inactive">🔴 Inactives</option>
+                            </select>
+
+                            <button onclick="loadJobOffers()" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+
+                            <button onclick="showCreateOfferModal()" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Nouvelle Offre
+                            </button>
+                        </div>
+                    </div>
+                    <div id="jobOffersTable" class="table-container">
+                        <div class="loading">Chargement des offres d'emploi...</div>
+                    </div>
+                </div>
+
+                <!-- Gestion des Utilisateurs -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">👨‍💼 Gestion des Utilisateurs</h2>
+                        <div class="header-controls">
+                            <select id="userRoleFilter" onchange="filterUsers()" class="form-select">
+                                <option value="">Tous les rôles</option>
+                                <option value="super_admin">Super Admin</option>
+                                <option value="admin">Admin</option>
+                                <option value="hr_director">Directeur RH</option>
+                                <option value="hr_manager">Responsable RH</option>
+                                <option value="senior_recruiter">Recruteur Senior</option>
+                                <option value="recruiter">Recruteur</option>
+                                <option value="junior_recruiter">Recruteur Junior</option>
+                                <option value="analyst">Analyste RH</option>
+                                <option value="viewer">Observateur</option>
+                            </select>
+                            <button onclick="loadUsers(1)" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualiser
+                            </button>
+                            <button onclick="showRolesManagement()" class="btn btn-primary btn-sm">
+                                <i class="fas fa-user-cog"></i> Gérer les Rôles
+                            </button>
+                        </div>
+                    </div>
+                    <div id="usersTable" class="table-container">
+                        <div class="loading">Chargement des utilisateurs...</div>
+                    </div>
+                </div>
+
+                <!-- Analyses IA -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🤖 Analyses IA</h2>
+                        <div class="header-controls">
+                            <button onclick="triggerAIAnalysis()" class="btn btn-primary btn-sm">
+                                <i class="fas fa-robot"></i>
+                                Analyser en lot
+                            </button>
+                            <button onclick="loadCVAnalyses()" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualiser
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cvAnalysesList">
+                        <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                            <i class="fas fa-robot" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Chargement des analyses IA...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar-content">
+                <!-- AI Analysis Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🤖 Statut IA</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">API OpenAI</span>
+                            <span id="aiStatus" style="color: #10b981; font-weight: 500;">🟢 Connecté</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">Analyses aujourd'hui</span>
+                            <strong id="todayAnalyses">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">Coût estimé</span>
+                            <strong id="estimatedCost">$0.00</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">Tokens utilisés</span>
+                            <strong id="tokensUsed">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Activité récente</h3>
+                    </div>
+                    <ul class="recent-list" id="recentActivity">
+                        <li class="recent-item">
+                            <div class="recent-avatar">⏳</div>
+                            <div class="recent-info">
+                                <h4>Chargement...</h4>
+                                <p>Récupération des données</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Statistiques CV</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">CVs soumis aujourd'hui</span>
+                            <strong id="todayCandidates">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">En attente d'analyse</span>
+                            <strong id="pendingAnalysesCount">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">Score moyen</span>
+                            <strong id="averageScoreDisplay">0%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--gray-600);">Taux de correspondance</span>
+                            <strong id="matchRate">0%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+    <!-- Modal pour voir les détails d'une analyse -->
+    <div id="analysisModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAnalysisModal()">&times;</span>
+            <div id="analysisDetails">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Détails Candidat -->
+    <div id="candidateDetailsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close" onclick="closeCandidateDetailsModal()">&times;</span>
+            <h2 id="candidateDetailsTitle">📋 Détails du Candidat</h2>
+            <div id="candidateDetailsContent">
+                <div class="loading">Chargement des détails...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Détails Utilisateur -->
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeUserDetailsModal()">&times;</span>
+            <h2 id="userDetailsTitle">👤 Détails de l'Utilisateur</h2>
+            <div id="userDetailsContent">
+                <div class="loading">Chargement des détails...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Changement de Statut -->
+    <div id="statusChangeModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeStatusChangeModal()">&times;</span>
+            <h2>🔄 Changer le Statut</h2>
+            <form id="statusChangeForm">
+                <input type="hidden" id="candidateIdForStatus">
+                <div style="margin-bottom: 1rem;">
+                    <label for="newStatus">Nouveau statut :</label>
+                    <select id="newStatus" class="form-select" required>
+                        <option value="">Sélectionner un statut</option>
+                        <option value="pending">🕐 En attente</option>
+                        <option value="reviewing">🔍 En cours d'examen</option>
+                        <option value="interviewed">💬 Entretien passé</option>
+                        <option value="accepted">✅ Accepté</option>
+                        <option value="rejected">❌ Rejeté</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label for="statusNote">Note (optionnel) :</label>
+                    <textarea id="statusNote" class="form-control" rows="3" placeholder="Commentaire sur le changement de statut..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeStatusChangeModal()" class="btn btn-secondary">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Création d'Offre -->
+    <div id="createOfferModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close" onclick="closeCreateOfferModal()">&times;</span>
+            <h2>➕ Créer une Nouvelle Offre</h2>
+            <form id="createOfferForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label for="offerTitle">Titre de l'offre *</label>
+                        <input type="text" id="offerTitle" class="form-control" required placeholder="Ex: Développeur Full Stack">
+                    </div>
+                    <div>
+                        <label for="offerType">Type *</label>
+                        <select id="offerType" class="form-control" required>
+                            <option value="">Sélectionner...</option>
+                            <option value="emploi">💼 Emploi</option>
+                            <option value="stage">🎓 Stage</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label for="companyName">Nom de l'entreprise *</label>
+                        <input type="text" id="companyName" class="form-control" required placeholder="Ex: TechCorp Solutions">
+                    </div>
+                    <div>
+                        <label for="offerLocation">Localisation *</label>
+                        <input type="text" id="offerLocation" class="form-control" required placeholder="Ex: Paris, France">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label for="contractType">Type de contrat *</label>
+                        <select id="contractType" class="form-control" required>
+                            <option value="">Sélectionner...</option>
+                            <option value="CDI">CDI</option>
+                            <option value="CDD">CDD</option>
+                            <option value="Stage">Stage</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Alternance">Alternance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="experienceLevel">Niveau d'expérience *</label>
+                        <select id="experienceLevel" class="form-control" required>
+                            <option value="">Sélectionner...</option>
+                            <option value="junior">🌱 Junior (0-2 ans)</option>
+                            <option value="intermediate">🚀 Intermédiaire (2-5 ans)</option>
+                            <option value="senior">⭐ Senior (5+ ans)</option>
+                            <option value="expert">🏆 Expert (8+ ans)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="salaryRange">Fourchette salariale</label>
+                    <input type="text" id="salaryRange" class="form-control" placeholder="Ex: 45000-55000 EUR ou 800-1000 EUR/mois">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="offerDescription">Description *</label>
+                    <textarea id="offerDescription" class="form-control" rows="4" required
+                              placeholder="Décrivez le poste, les missions, l'environnement de travail..."></textarea>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="offerRequirements">Exigences et compétences *</label>
+                    <textarea id="offerRequirements" class="form-control" rows="3" required
+                              placeholder="Compétences techniques, expérience requise, diplômes..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label for="contactEmail">Email de contact *</label>
+                        <input type="email" id="contactEmail" class="form-control" required placeholder="recrutement@entreprise.com">
+                    </div>
+                    <div>
+                        <label for="positionsAvailable">Nombre de postes</label>
+                        <input type="number" id="positionsAvailable" class="form-control" min="1" value="1">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="applicationDeadline">Date limite de candidature</label>
+                    <input type="date" id="applicationDeadline" class="form-control">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="companyDescription">Description de l'entreprise</label>
+                    <textarea id="companyDescription" class="form-control" rows="2"
+                              placeholder="Présentation de l'entreprise, secteur d'activité..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeCreateOfferModal()" class="btn btn-secondary">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Créer l'Offre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Gestion des Rôles -->
+    <div id="rolesModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <span class="close" onclick="closeRolesModal()">&times;</span>
+            <h2>👨‍💼 Gestion des Rôles et Permissions</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Liste des rôles -->
+                <div>
+                    <h3>🏷️ Rôles Disponibles</h3>
+                    <div id="rolesList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Sera rempli par JavaScript -->
+                    </div>
+                    <button onclick="showCreateRoleForm()" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+                        <i class="fas fa-plus"></i> Nouveau Rôle
+                    </button>
+                </div>
+
+                <!-- Permissions du rôle sélectionné -->
+                <div>
+                    <h3>🔐 Permissions</h3>
+                    <div id="permissionsList" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">
+                            Sélectionnez un rôle pour voir ses permissions
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modification de Rôle Utilisateur -->
+    <div id="editUserRoleModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeEditUserRoleModal()">&times;</span>
+            <h2>🔧 Modifier le Rôle</h2>
+            <form id="editUserRoleForm">
+                <input type="hidden" id="userIdForRole">
+
+                <div style="margin-bottom: 1rem;">
+                    <label>Utilisateur :</label>
+                    <div id="userInfoForRole" style="padding: 0.5rem; background: #f8f9fa; border-radius: 6px; margin-top: 0.5rem;">
+                        <!-- Sera rempli par JavaScript -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="newUserRole">Nouveau rôle *</label>
+                    <select id="newUserRole" class="form-control" required>
+                        <option value="">Sélectionner un rôle...</option>
+                        <!-- Sera rempli par JavaScript -->
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="roleChangeReason">Raison du changement</label>
+                    <textarea id="roleChangeReason" class="form-control" rows="2"
+                              placeholder="Pourquoi changer le rôle de cet utilisateur ?"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeEditUserRoleModal()" class="btn btn-secondary">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Modifier le Rôle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="auth/app.js"></script>
+    <script>
+        // Variables globales
+        let currentCVAnalyses = [];
+        let aiAnalysisInProgress = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadDashboardData();
+            loadCandidates();
+            loadJobOffers();
+            loadUsers();
+            loadCVAnalyses();
+            setupEventListeners();
+        });
+
+        function checkAuthentication() {
+            console.log('🔐 Vérification de l\'authentification...');
+            console.log('TokenManager disponible:', typeof TokenManager !== 'undefined');
+
+            if (typeof TokenManager === 'undefined') {
+                console.error('❌ TokenManager non disponible');
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            const token = TokenManager.getToken();
+            console.log('Token récupéré:', token ? 'Présent (' + token.substring(0, 20) + '...)' : 'Absent');
+
+            if (!TokenManager.isAuthenticated()) {
+                console.log('❌ Utilisateur non authentifié');
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            console.log('✅ Utilisateur authentifié');
+        }
+
+        function setupEventListeners() {
+            // Formulaire de changement de statut
+            document.getElementById('statusChangeForm').addEventListener('submit', handleStatusChange);
+
+            // Formulaire de création d'offre
+            document.getElementById('createOfferForm').addEventListener('submit', handleCreateOffer);
+
+            // Formulaire de modification de rôle
+            document.getElementById('editUserRoleForm').addEventListener('submit', handleUserRoleChange);
+
+            // Fermer les modals en cliquant à l'extérieur
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+        }
+
+        // Gérer la soumission du changement de statut
+        async function handleStatusChange(event) {
+            event.preventDefault();
+
+            const candidateId = document.getElementById('candidateIdForStatus').value;
+            const newStatus = document.getElementById('newStatus').value;
+            const note = document.getElementById('statusNote').value;
+
+            if (!newStatus) {
+                alert('❌ Veuillez sélectionner un statut');
+                return;
+            }
+
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mise à jour...';
+
+            try {
+                const success = await updateCandidateStatus(candidateId, newStatus, note);
+                if (success) {
+                    closeStatusChangeModal();
+                    loadCandidates(); // Recharger la liste
+                    // Si le modal de détails est ouvert, le recharger aussi
+                    if (document.getElementById('candidateDetailsModal').style.display === 'block') {
+                        viewCandidateDetails(candidateId);
+                    }
+                }
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-save"></i> Sauvegarder';
+            }
+        }
+
+        async function loadDashboardData() {
+            console.log('🔄 Chargement des données du dashboard CV Filtering...');
+
+            try {
+                // Charger les informations utilisateur (toujours)
+                await loadUserInfo();
+
+                // Appliquer les permissions aux sections
+                applyPermissionsToUI();
+
+                // Charger les statistiques si autorisé
+                if (hasPermission('view_candidates') || hasPermission('view_analyses')) {
+                    await loadStatistics();
+                }
+
+                // Charger les analyses CV si autorisé
+                if (hasPermission('view_analyses')) {
+                    await loadCVAnalyses();
+                }
+
+                // Vérifier le statut de l'API IA si autorisé
+                if (hasPermission('view_analyses')) {
+                    await checkAIStatus();
+                }
+
+                console.log('✅ Dashboard CV Filtering chargé avec succès');
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement du dashboard:', error);
+            }
+        }
+
+        // Appliquer les permissions à l'interface utilisateur
+        function applyPermissionsToUI() {
+            // Masquer/afficher les actions rapides selon les permissions
+            const quickActions = document.querySelectorAll('.action-btn');
+            quickActions.forEach(action => {
+                const text = action.textContent.toLowerCase();
+
+                if (text.includes('utilisateurs') && !hasPermission('view_users')) {
+                    action.style.display = 'none';
+                }
+                if (text.includes('rapports') && !hasPermission('view_reports')) {
+                    action.style.display = 'none';
+                }
+                if (text.includes('analyses') && !hasPermission('view_analyses')) {
+                    action.style.display = 'none';
+                }
+            });
+
+            // Afficher un message pour les utilisateurs avec permissions limitées
+            const userRole = getCurrentUserRole();
+            if (!hasPermission('*') && (userRole === 'viewer' || userRole === 'junior_recruiter')) {
+                showLimitedAccessMessage();
+            }
+        }
+
+        // Afficher un message pour les accès limités
+        function showLimitedAccessMessage() {
+            const welcomeSection = document.querySelector('.welcome-section');
+            if (welcomeSection) {
+                const user = UserManager.getUser();
+                const roleName = user?.role?.name || 'unknown';
+
+                const message = document.createElement('div');
+                message.className = 'alert alert-info';
+                message.style.cssText = 'background: #e0f2fe; color: #01579b; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #0288d1;';
+                message.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Accès limité :</strong> Votre rôle "${roleName}" vous donne accès à certaines fonctionnalités uniquement.
+                    <br><small>🔍 DEBUG: Permissions testées - manage_candidates: ${hasPermission('manage_candidates')}, manage_users: ${hasPermission('manage_users')}, send_emails: ${hasPermission('send_emails')}, view_reports: ${hasPermission('view_reports')}</small>
+                `;
+                welcomeSection.appendChild(message);
+            }
+        }
+
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/backend/auth/profile', {
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const user = result.data.user;
+                        document.getElementById('userName').textContent = user.name;
+
+                        // Afficher le rôle avec couleur
+                        const roleElement = document.getElementById('userRole');
+                        if (user.role) {
+                            const roleColor = getRoleColor(user.role.name);
+                            roleElement.innerHTML = `<span style="color: ${roleColor}; font-weight: 600;">${user.role.display_name}</span>`;
+                        } else {
+                            roleElement.textContent = user.user_type || 'Aucun rôle';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des infos utilisateur:', error);
+            }
+        }
+
+        async function loadStatistics() {
+            console.log('📊 Chargement des statistiques CV Filtering...');
+
+            try {
+                // Charger les statistiques principales
+                const statsResponse = await fetch('/api/dashboard/statistics', {
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (statsResponse.ok) {
+                    const statsResult = await statsResponse.json();
+                    if (statsResult.success) {
+                        const stats = statsResult.data;
+
+                        // Mettre à jour les statistiques principales pour CV Filtering
+                        updateStatCard('totalCandidates', stats.main_stats.total_candidates);
+                        updateStatCard('analyzedCandidates', stats.main_stats.analyzed_candidates);
+                        updateStatCard('pendingAnalyses', stats.main_stats.pending_analyses || { value: stats.quick_stats.pending_analyses });
+                        updateStatCard('averageScore', stats.main_stats.match_rate);
+
+                        // Mettre à jour les statistiques de la sidebar
+                        document.getElementById('todayCandidates').textContent = stats.quick_stats.today_candidates || 0;
+                        document.getElementById('pendingAnalysesCount').textContent = stats.quick_stats.pending_analyses || 0;
+                        document.getElementById('averageScoreDisplay').textContent = stats.main_stats.match_rate?.value || '0%';
+                        document.getElementById('matchRate').textContent = stats.quick_stats.success_rate || '0%';
+
+                        // Statistiques IA
+                        document.getElementById('todayAnalyses').textContent = stats.quick_stats.today_analyses || 0;
+
+                        console.log('✅ Statistiques CV Filtering chargées avec succès');
+                    }
+                } else {
+                    console.error('❌ Erreur lors du chargement des statistiques:', statsResponse.status);
+                    loadFallbackStats();
+                }
+
+                // Charger l'activité récente
+                await loadRecentActivity();
+
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement des statistiques:', error);
+                loadFallbackStats();
+            }
+        }
+
+        function updateStatCard(elementId, statData) {
+            const element = document.getElementById(elementId);
+            if (element && statData) {
+                element.textContent = statData.value;
+
+                // Mettre à jour l'indicateur de croissance si disponible
+                const card = element.closest('.stat-card');
+                const changeElement = card?.querySelector('.stat-change');
+                if (changeElement && statData.growth !== undefined) {
+                    const growth = statData.growth;
+                    changeElement.textContent = (growth >= 0 ? '+' : '') + growth + '%';
+                    changeElement.className = `stat-change ${growth >= 0 ? 'positive' : 'negative'}`;
+                }
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                const response = await fetch('/api/dashboard/recent-activity', {
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        displayRecentActivity(result.data);
+                        console.log('✅ Activité récente chargée');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement de l\'activité récente:', error);
+            }
+        }
+
+        function displayRecentActivity(activities) {
+            const container = document.getElementById('recentActivity');
+            if (!container || !activities.length) return;
+
+            container.innerHTML = activities.map(activity => `
+                <li class="recent-item">
+                    <div class="recent-avatar">${activity.avatar}</div>
+                    <div class="recent-info">
+                        <h4>${activity.title}</h4>
+                        <p>${activity.description}</p>
+                        <small style="color: var(--gray-400); font-size: 0.7rem;">${activity.time}</small>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Nouvelles fonctions pour le CV Filtering System
+        async function loadCVAnalyses() {
+            console.log('🧠 Chargement des analyses CV...');
+
+            try {
+                const response = await fetch('/api/cv-analyses', {
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        currentCVAnalyses = result.data;
+                        displayCVAnalyses(result.data);
+                        console.log('✅ Analyses CV chargées:', result.data.length);
+                    }
+                } else {
+                    console.error('❌ Erreur lors du chargement des analyses CV');
+                    displayNoCVAnalyses();
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                displayNoCVAnalyses();
+            }
+        }
+
+        function displayCVAnalyses(analyses) {
+            const container = document.getElementById('cvAnalysesList');
+
+            if (!analyses || analyses.length === 0) {
+                displayNoCVAnalyses();
+                return;
+            }
+
+            // Limiter à 5 analyses pour éviter le scroll
+            const limitedAnalyses = analyses.slice(0, 5);
+
+            container.innerHTML = limitedAnalyses.map(analysis => `
+                <div class="cv-card">
+                    <div class="cv-header">
+                        <div class="candidate-info">
+                            <h3>${analysis.candidate_name || 'Candidat'}</h3>
+                            <p>${analysis.candidate_email || 'Email non disponible'}</p>
+                            <p style="font-size: 0.75rem; color: var(--gray-500);">
+                                Soumis le ${formatDate(analysis.created_at)}
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span class="status-badge status-${analysis.analysis_status}">
+                                ${getStatusLabel(analysis.analysis_status)}
+                            </span>
+                            ${analysis.job_match_score ? `
+                                <div class="score-circle ${getScoreClass(analysis.job_match_score)}">
+                                    ${analysis.job_match_score}%
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${analysis.analysis_status === 'completed' ? `
+                        <div class="ai-score">
+                            <div style="flex: 1;">
+                                <p style="margin: 0; font-size: 0.875rem; color: var(--gray-600);">
+                                    ${analysis.profile_summary || 'Résumé non disponible'}
+                                </p>
+                                ${analysis.key_skills ? `
+                                    <div class="skills-list">
+                                        ${JSON.parse(analysis.key_skills).slice(0, 5).map(skill =>
+                                            `<span class="skill-tag">${skill}</span>`
+                                        ).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <button onclick="showAnalysisDetails(${analysis.id})" class="btn btn-primary">
+                                <i class="fas fa-eye"></i>
+                                Voir détails
+                            </button>
+                        </div>
+                    ` : `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                            <p style="margin: 0; color: var(--gray-600);">
+                                ${analysis.analysis_status === 'pending' ? 'En attente d\'analyse IA...' : 'Analyse en cours...'}
+                            </p>
+                            ${analysis.analysis_status === 'pending' ? `
+                                <button onclick="triggerSingleAnalysis(${analysis.id})" class="btn btn-primary">
+                                    <i class="fas fa-robot"></i>
+                                    Analyser maintenant
+                                </button>
+                            ` : ''}
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function displayNoCVAnalyses() {
+            const container = document.getElementById('cvAnalysesList');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                    <i class="fas fa-file-alt" style="font-size: 4rem; margin-bottom: 1rem; color: var(--gray-300);"></i>
+                    <h3 style="margin: 0 0 0.5rem 0; color: var(--gray-600);">Aucun CV soumis</h3>
+                    <p style="margin: 0 0 1.5rem 0;">Commencez par soumettre des CVs pour voir les analyses IA ici.</p>
+                    <button onclick="showCandidateForm()" class="btn btn-primary">
+                        <i class="fas fa-upload"></i>
+                        Soumettre le premier CV
+                    </button>
+                </div>
+            `;
+        }
+
+        async function checkAIStatus() {
+            try {
+                const response = await fetch('/api/ai/status', {
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const statusElement = document.getElementById('aiStatus');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data.connected) {
+                        statusElement.innerHTML = '🟢 Connecté';
+                        statusElement.style.color = '#10b981';
+                    } else {
+                        statusElement.innerHTML = '🟡 Limité';
+                        statusElement.style.color = '#f59e0b';
+                    }
+                } else {
+                    statusElement.innerHTML = '🔴 Déconnecté';
+                    statusElement.style.color = '#ef4444';
+                }
+            } catch (error) {
+                document.getElementById('aiStatus').innerHTML = '🔴 Erreur';
+                document.getElementById('aiStatus').style.color = '#ef4444';
+            }
+        }
+
+        function loadFallbackStats() {
+            console.log('⚠️ Chargement des statistiques de fallback');
+            document.getElementById('totalCandidates').textContent = '---';
+            document.getElementById('analyzedCandidates').textContent = '---';
+            document.getElementById('pendingAnalyses').textContent = '---';
+            document.getElementById('averageScore').textContent = '---';
+        }
+
+        // Fonctions pour la gestion admin
+        function showCandidatesManagement() {
+            loadCandidates();
+            // Scroll vers la section candidats
+            document.getElementById('candidatesTable').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showUsersManagement() {
+            loadUsers();
+            // Scroll vers la section utilisateurs
+            document.getElementById('usersTable').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showReports() {
+            window.open('reports.html', '_blank');
+        }
+
+        function closeAnalysisModal() {
+            document.getElementById('analysisModal').style.display = 'none';
+        }
+
+        // Variables pour la pagination des candidats
+        let currentCandidatesPage = 1;
+        let candidatesPerPage = 5;
+        let candidatesFilters = {
+            search: '',
+            status: 'all',
+            job_offer_id: 'all',
+            sort_by: 'created_at',
+            sort_order: 'desc'
+        };
+
+        // Charger la liste des candidats avec pagination
+        async function loadCandidates(page = 1, filters = {}) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return;
+                }
+
+                // Mettre à jour les filtres
+                candidatesFilters = { ...candidatesFilters, ...filters };
+                currentCandidatesPage = page;
+
+                // Construire les paramètres de requête
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: candidatesPerPage,
+                    ...candidatesFilters
+                });
+
+                document.getElementById('candidatesTable').innerHTML = '<div class="loading">Chargement des candidats...</div>';
+
+                const response = await fetch(`/api/candidates?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayCandidates(result.data || [], result.pagination || {});
+                } else {
+                    document.getElementById('candidatesTable').innerHTML =
+                        '<div class="error">Erreur lors du chargement des candidats</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('candidatesTable').innerHTML =
+                    '<div class="error">Erreur de connexion</div>';
+            }
+        }
+
+        // Afficher les candidats dans un tableau avec pagination
+        function displayCandidates(candidates, pagination = {}) {
+            const container = document.getElementById('candidatesTable');
+
+            if (candidates.length === 0) {
+                container.innerHTML = '<div class="no-data">Aucun candidat trouvé</div>';
+                return;
+            }
+
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortCandidatesBy('id')" style="cursor: pointer;">
+                                ID <i class="fas fa-sort"></i>
+                            </th>
+                            <th onclick="sortCandidatesBy('nom')" style="cursor: pointer;">
+                                Candidat <i class="fas fa-sort"></i>
+                            </th>
+                            <th onclick="sortCandidatesBy('email')" style="cursor: pointer;">
+                                Email <i class="fas fa-sort"></i>
+                            </th>
+                            <th>Offre d'emploi</th>
+                            <th onclick="sortCandidatesBy('status')" style="cursor: pointer;">
+                                Statut <i class="fas fa-sort"></i>
+                            </th>
+                            <th onclick="sortCandidatesBy('created_at')" style="cursor: pointer;">
+                                Date <i class="fas fa-sort"></i>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            candidates.forEach(candidate => {
+                const statusBadge = getStatusBadge(candidate.status);
+                const submittedDate = new Date(candidate.created_at).toLocaleDateString('fr-FR');
+                const submittedTime = new Date(candidate.created_at).toLocaleTimeString('fr-FR');
+
+                html += `
+                    <tr>
+                        <td><strong>#${candidate.id}</strong></td>
+                        <td>
+                            <div class="candidate-info">
+                                <strong>${candidate.prenom} ${candidate.nom}</strong>
+                                ${candidate.linkedin_url ? `<br><a href="${candidate.linkedin_url}" target="_blank" class="linkedin-link">LinkedIn</a>` : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="mailto:${candidate.email}" style="color: #3498db;">${candidate.email}</a>
+                            <br><small style="color: #7f8c8d;">${candidate.telephone}</small>
+                        </td>
+                        <td>
+                            ${candidate.job_offer ? `
+                                <div>
+                                    <strong>${candidate.job_offer.title}</strong>
+                                    <br><small style="color: #7f8c8d;">${candidate.job_offer.company_name}</small>
+                                    <br><span class="badge ${candidate.job_offer.type === 'emploi' ? 'badge-emploi' : 'badge-stage'}" style="font-size: 0.7rem;">
+                                        ${candidate.job_offer.type === 'emploi' ? '💼 Emploi' : '🎓 Stage'}
+                                    </span>
+                                </div>
+                            ` : '<span style="color: #95a5a6;">Aucune offre</span>'}
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div>
+                                ${submittedDate}
+                                <br><small style="color: #7f8c8d;">${submittedTime}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <button onclick="viewCandidateDetails(${candidate.id})" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </button>
+                                ${hasPermission('manage_candidates') ? `
+                                    <button onclick="changeCandidateStatus(${candidate.id})" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i> Statut
+                                    </button>
+                                    ${candidate.cv_analyses && candidate.cv_analyses.length > 0 ?
+                                        `<button onclick="viewAnalysis(${candidate.cv_analyses[0].id})" class="btn btn-sm btn-success">
+                                            <i class="fas fa-brain"></i> Analyse
+                                        </button>` :
+                                        `<button onclick="triggerAnalysis(${candidate.id})" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-robot"></i> Analyser
+                                        </button>`
+                                    }
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            // Ajouter la pagination si disponible
+            if (pagination && pagination.last_page > 1) {
+                html += generatePagination(pagination);
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Générer la pagination
+        function generatePagination(pagination) {
+            let paginationHTML = '<div class="pagination-container" style="margin-top: 20px; text-align: center;">';
+
+            // Info pagination
+            paginationHTML += `
+                <div class="pagination-info" style="margin-bottom: 15px; color: #7f8c8d;">
+                    Affichage de ${pagination.from || 0} à ${pagination.to || 0} sur ${pagination.total} candidats
+                </div>
+            `;
+
+            paginationHTML += '<div class="pagination" style="display: inline-flex; gap: 5px; align-items: center;">';
+
+            // Bouton précédent
+            if (pagination.current_page > 1) {
+                paginationHTML += `
+                    <button onclick="loadCandidates(${pagination.current_page - 1})" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-chevron-left"></i> Précédent
+                    </button>
+                `;
+            }
+
+            // Numéros de page
+            const startPage = Math.max(1, pagination.current_page - 2);
+            const endPage = Math.min(pagination.last_page, pagination.current_page + 2);
+
+            if (startPage > 1) {
+                paginationHTML += `<button onclick="loadCandidates(1)" class="btn btn-sm btn-outline">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span style="padding: 0 10px;">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === pagination.current_page;
+                paginationHTML += `
+                    <button onclick="loadCandidates(${i})"
+                            class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline'}"
+                            ${isActive ? 'style="background: #3498db; color: white;"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            if (endPage < pagination.last_page) {
+                if (endPage < pagination.last_page - 1) {
+                    paginationHTML += `<span style="padding: 0 10px;">...</span>`;
+                }
+                paginationHTML += `<button onclick="loadCandidates(${pagination.last_page})" class="btn btn-sm btn-outline">${pagination.last_page}</button>`;
+            }
+
+            // Bouton suivant
+            if (pagination.current_page < pagination.last_page) {
+                paginationHTML += `
+                    <button onclick="loadCandidates(${pagination.current_page + 1})" class="btn btn-sm btn-secondary">
+                        Suivant <i class="fas fa-chevron-right"></i>
+                    </button>
+                `;
+            }
+
+            paginationHTML += '</div></div>';
+
+            return paginationHTML;
+        }
+
+        // Variables pour la pagination des utilisateurs
+        let currentUsersPage = 1;
+        let usersPerPage = 5;
+
+        // Charger la liste des utilisateurs avec pagination
+        async function loadUsers(page = 1) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return;
+                }
+
+                document.getElementById('usersTable').innerHTML = '<div class="loading">Chargement des utilisateurs...</div>';
+
+                const response = await fetch(`/api/users-public?page=${page}&per_page=${usersPerPage}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        // L'API publique retourne directement les données
+                        const users = result.data || [];
+                        const pagination = result.pagination || {};
+                        displayUsers(users, pagination);
+                        currentUsersPage = page;
+                    }
+                } else {
+                    document.getElementById('usersTable').innerHTML =
+                        '<div class="error">Erreur lors du chargement des utilisateurs</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('usersTable').innerHTML =
+                    '<div class="error">Erreur de connexion</div>';
+            }
+        }
+
+        // Afficher les utilisateurs dans un tableau avec pagination
+        function displayUsers(users, pagination = {}) {
+            const container = document.getElementById('usersTable');
+
+            if (users.length === 0) {
+                container.innerHTML = '<div class="no-data">Aucun utilisateur trouvé</div>';
+                return;
+            }
+
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Dernière connexion</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                const statusBadge = user.is_active ?
+                    '<span class="badge badge-success">Actif</span>' :
+                    '<span class="badge badge-danger">Inactif</span>';
+                const lastLogin = user.last_login_at ?
+                    new Date(user.last_login_at).toLocaleDateString('fr-FR') : 'Jamais';
+                const roleName = user.roles && user.roles.length > 0 ?
+                    user.roles[0].display_name : 'Aucun rôle';
+
+                html += `
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <strong>${user.first_name} ${user.last_name}</strong>
+                                <br><small class="text-muted">${user.name}</small>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>
+                            <span class="role-badge">${roleName}</span>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>${lastLogin}</td>
+                        <td>
+                            ${hasPermission('view_users') ? `
+                                <button onclick="viewUserDetails(${user.id})" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </button>
+                            ` : ''}
+                            ${hasPermission('manage_users') ? `
+                                <button onclick="editUserRole(${user.id})" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-user-tag"></i> Rôle
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            // Ajouter la pagination si disponible
+            if (pagination && pagination.last_page > 1) {
+                html += generateUsersPagination(pagination);
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Générer la pagination pour les utilisateurs
+        function generateUsersPagination(pagination) {
+            let paginationHTML = '<div class="pagination-container" style="margin-top: 20px; text-align: center;">';
+
+            paginationHTML += `
+                <div class="pagination-info" style="margin-bottom: 15px; color: #7f8c8d;">
+                    Affichage de ${pagination.from || 0} à ${pagination.to || 0} sur ${pagination.total} utilisateurs
+                </div>
+            `;
+
+            paginationHTML += '<div class="pagination" style="display: inline-flex; gap: 5px; align-items: center;">';
+
+            // Bouton précédent
+            if (pagination.current_page > 1) {
+                paginationHTML += `
+                    <button onclick="loadUsers(${pagination.current_page - 1})" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-chevron-left"></i> Précédent
+                    </button>
+                `;
+            }
+
+            // Numéros de page (limités pour éviter trop de boutons)
+            const startPage = Math.max(1, pagination.current_page - 1);
+            const endPage = Math.min(pagination.last_page, pagination.current_page + 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === pagination.current_page;
+                paginationHTML += `
+                    <button onclick="loadUsers(${i})"
+                            class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline'}"
+                            ${isActive ? 'style="background: #3498db; color: white;"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // Bouton suivant
+            if (pagination.current_page < pagination.last_page) {
+                paginationHTML += `
+                    <button onclick="loadUsers(${pagination.current_page + 1})" class="btn btn-sm btn-secondary">
+                        Suivant <i class="fas fa-chevron-right"></i>
+                    </button>
+                `;
+            }
+
+            paginationHTML += '</div></div>';
+
+            return paginationHTML;
+        }
+
+        // Fonction utilitaire pour les badges de statut
+        function getStatusBadge(status) {
+            const statusConfig = {
+                'pending': { class: 'badge-warning', text: 'En attente', icon: 'clock' },
+                'reviewing': { class: 'badge-info', text: 'En examen', icon: 'search' },
+                'interviewed': { class: 'badge-primary', text: 'Entretien', icon: 'comments' },
+                'accepted': { class: 'badge-success', text: 'Accepté', icon: 'check' },
+                'rejected': { class: 'badge-danger', text: 'Rejeté', icon: 'times' }
+            };
+
+            const config = statusConfig[status] || { class: 'badge-secondary', text: status, icon: 'question' };
+            return `<span class="badge ${config.class}">
+                        <i class="fas fa-${config.icon}"></i> ${config.text}
+                    </span>`;
+        }
+
+        // Filtrer les candidats par statut
+        function filterCandidates() {
+            const filter = document.getElementById('candidateStatusFilter').value;
+            loadCandidates(filter);
+        }
+
+        // Filtrer les utilisateurs par rôle
+        function filterUsers() {
+            const filter = document.getElementById('userRoleFilter').value;
+            loadUsers(filter);
+        }
+
+        // Voir les détails d'un candidat
+        async function viewCandidateDetails(candidateId) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return;
+                }
+
+                // Afficher le modal avec loading
+                document.getElementById('candidateDetailsModal').style.display = 'block';
+                document.getElementById('candidateDetailsContent').innerHTML = '<div class="loading">Chargement des détails...</div>';
+
+                const response = await fetch(`/api/candidates/${candidateId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayCandidateDetails(result.data);
+                } else {
+                    document.getElementById('candidateDetailsContent').innerHTML =
+                        '<div class="error">Erreur lors du chargement des détails du candidat</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('candidateDetailsContent').innerHTML =
+                    '<div class="error">Erreur de connexion</div>';
+            }
+        }
+
+        // Afficher les détails du candidat
+        function displayCandidateDetails(candidate) {
+            document.getElementById('candidateDetailsTitle').innerHTML =
+                `📋 Détails de ${candidate.prenom} ${candidate.nom}`;
+
+            const submittedDate = new Date(candidate.created_at).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const statusBadge = getStatusBadge(candidate.status);
+
+            let html = `
+                <div class="details-section">
+                    <h3>👤 Informations personnelles</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Prénom</span>
+                            <span class="detail-value">${candidate.prenom}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Nom</span>
+                            <span class="detail-value">${candidate.nom}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email</span>
+                            <span class="detail-value">${candidate.email}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Téléphone</span>
+                            <span class="detail-value">${candidate.telephone}</span>
+                        </div>
+                        ${candidate.linkedin_url ? `
+                        <div class="detail-item">
+                            <span class="detail-label">LinkedIn</span>
+                            <span class="detail-value">
+                                <a href="${candidate.linkedin_url}" target="_blank" class="linkedin-link">
+                                    <i class="fab fa-linkedin"></i> Voir le profil
+                                </a>
+                            </span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>📄 Documents</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">CV</span>
+                            <span class="detail-value">
+                                <a href="/storage/${candidate.cv_path}" target="_blank" class="file-link">
+                                    <i class="fas fa-file-pdf"></i> Télécharger CV
+                                </a>
+                            </span>
+                        </div>
+                        ${candidate.cover_letter_path ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Lettre de motivation</span>
+                            <span class="detail-value">
+                                <a href="/storage/${candidate.cover_letter_path}" target="_blank" class="file-link">
+                                    <i class="fas fa-file-pdf"></i> Télécharger lettre
+                                </a>
+                            </span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>📊 Statut et suivi</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Statut actuel</span>
+                            <span class="detail-value">${statusBadge}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date de soumission</span>
+                            <span class="detail-value">${submittedDate}</span>
+                        </div>
+                        ${candidate.status_updated_at ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Dernière mise à jour</span>
+                            <span class="detail-value">${new Date(candidate.status_updated_at).toLocaleDateString('fr-FR')}</span>
+                        </div>
+                        ` : ''}
+                        ${candidate.notes ? `
+                        <div class="detail-item" style="grid-column: 1 / -1;">
+                            <span class="detail-label">Notes</span>
+                            <span class="detail-value">${candidate.notes}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>⚡ Actions</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        ${hasPermission('manage_candidates') ? `
+                            <button onclick="showStatusChangeModal(${candidate.id})" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Changer le statut
+                            </button>
+                        ` : ''}
+                        <button onclick="downloadCandidateCV(${candidate.id})" class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Télécharger CV
+                        </button>
+                        ${hasPermission('send_emails') ? `
+                            <button onclick="sendEmailToCandidate(${candidate.id})" class="btn btn-info">
+                                <i class="fas fa-envelope"></i> Envoyer email
+                            </button>
+                        ` : ''}
+                        ${hasPermission('manage_candidates') ? `
+                            <button onclick="addCandidateNote(${candidate.id})" class="btn btn-warning">
+                                <i class="fas fa-sticky-note"></i> Ajouter note
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('candidateDetailsContent').innerHTML = html;
+        }
+
+        // Fermer le modal des détails candidat
+        function closeCandidateDetailsModal() {
+            document.getElementById('candidateDetailsModal').style.display = 'none';
+        }
+
+        // Changer le statut d'un candidat (via modal)
+        function changeCandidateStatus(candidateId) {
+            showStatusChangeModal(candidateId);
+        }
+
+        // Afficher le modal de changement de statut
+        function showStatusChangeModal(candidateId) {
+            document.getElementById('candidateIdForStatus').value = candidateId;
+            document.getElementById('statusChangeModal').style.display = 'block';
+            document.getElementById('newStatus').value = '';
+            document.getElementById('statusNote').value = '';
+        }
+
+        // Fermer le modal de changement de statut
+        function closeStatusChangeModal() {
+            document.getElementById('statusChangeModal').style.display = 'none';
+        }
+
+        // Mettre à jour le statut d'un candidat
+        async function updateCandidateStatus(candidateId, newStatus, note = null) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return false;
+                }
+
+                const requestBody = { status: newStatus };
+                if (note) {
+                    requestBody.note = note;
+                }
+
+                const response = await fetch(`/api/candidates/${candidateId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    alert('✅ Statut mis à jour avec succès');
+                    return true;
+                } else {
+                    const error = await response.json();
+                    alert('❌ Erreur: ' + (error.message || 'Erreur lors de la mise à jour du statut'));
+                    return false;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur de connexion');
+                return false;
+            }
+        }
+
+        // Voir les détails d'un utilisateur
+        async function viewUserDetails(userId) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return;
+                }
+
+                // Afficher le modal avec loading
+                document.getElementById('userDetailsModal').style.display = 'block';
+                document.getElementById('userDetailsContent').innerHTML = '<div class="loading">Chargement des détails...</div>';
+
+                const response = await fetch(`/api/backend/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayUserDetails(result.data);
+                } else {
+                    document.getElementById('userDetailsContent').innerHTML =
+                        '<div class="error">Erreur lors du chargement des détails de l\'utilisateur</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('userDetailsContent').innerHTML =
+                    '<div class="error">Erreur de connexion</div>';
+            }
+        }
+
+        // Afficher les détails de l'utilisateur
+        function displayUserDetails(user) {
+            document.getElementById('userDetailsTitle').innerHTML =
+                `👤 Détails de ${user.first_name} ${user.last_name}`;
+
+            const createdDate = new Date(user.created_at).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const lastLoginDate = user.last_login_at ?
+                new Date(user.last_login_at).toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : 'Jamais connecté';
+
+            const statusBadge = user.is_active ?
+                '<span class="badge badge-success"><i class="fas fa-check"></i> Actif</span>' :
+                '<span class="badge badge-danger"><i class="fas fa-times"></i> Inactif</span>';
+
+            const roleName = user.role ? user.role.display_name : 'Aucun rôle assigné';
+            const roleColor = user.role ? getRoleColor(user.role.name) : '#6b7280';
+
+            let html = `
+                <div class="details-section">
+                    <h3>👤 Informations personnelles</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Nom d'utilisateur</span>
+                            <span class="detail-value">${user.name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Prénom</span>
+                            <span class="detail-value">${user.first_name || 'Non renseigné'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Nom</span>
+                            <span class="detail-value">${user.last_name || 'Non renseigné'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email</span>
+                            <span class="detail-value">${user.email}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>🔐 Rôle et permissions</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Rôle</span>
+                            <span class="detail-value">
+                                <span class="role-badge" style="background: ${roleColor};">${roleName}</span>
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Statut</span>
+                            <span class="detail-value">${statusBadge}</span>
+                        </div>
+                    </div>
+                    ${user.role ? `
+                    <div style="margin-top: 1rem;">
+                        <span class="detail-label">Permissions du rôle :</span>
+                        <div class="permission-list">
+                            ${getRolePermissions(user.role.name).map(permission =>
+                                `<span class="permission-badge">${permission}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="details-section">
+                    <h3>📊 Activité</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Date de création</span>
+                            <span class="detail-value">${createdDate}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Dernière connexion</span>
+                            <span class="detail-value">${lastLoginDate}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>⚡ Actions</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        ${hasPermission('manage_users') ? `
+                            <button onclick="editUserRole(${user.id})" class="btn btn-primary">
+                                <i class="fas fa-user-tag"></i> Modifier le rôle
+                            </button>
+                            <button onclick="toggleUserStatus(${user.id})" class="btn ${user.is_active ? 'btn-warning' : 'btn-success'}">
+                                <i class="fas fa-${user.is_active ? 'ban' : 'check'}"></i>
+                                ${user.is_active ? 'Désactiver' : 'Activer'}
+                            </button>
+                        ` : ''}
+                        ${hasPermission('send_emails') ? `
+                            <button onclick="sendEmailToUser(${user.id})" class="btn btn-info">
+                                <i class="fas fa-envelope"></i> Envoyer email
+                            </button>
+                        ` : ''}
+                        <button onclick="viewUserActivity(${user.id})" class="btn btn-secondary">
+                            <i class="fas fa-history"></i> Voir l'activité
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('userDetailsContent').innerHTML = html;
+        }
+
+        // Fermer le modal des détails utilisateur
+        function closeUserDetailsModal() {
+            document.getElementById('userDetailsModal').style.display = 'none';
+        }
+
+        // Modifier le rôle d'un utilisateur
+        async function editUserRole(userId) {
+            try {
+                // Charger les informations de l'utilisateur
+                const userResponse = await fetch(`/api/users-public?page=1&per_page=100`);
+                const userData = await userResponse.json();
+                const user = userData.data.find(u => u.id === userId);
+
+                if (!user) {
+                    alert('Utilisateur non trouvé');
+                    return;
+                }
+
+                // Charger les rôles disponibles
+                await loadAvailableRoles();
+
+                // Remplir le modal
+                document.getElementById('userIdForRole').value = userId;
+                document.getElementById('userInfoForRole').innerHTML = `
+                    <strong>${user.first_name} ${user.last_name}</strong><br>
+                    <small>${user.email}</small><br>
+                    <span class="badge badge-info">Rôle actuel: ${user.roles.length > 0 ? user.roles[0].display_name : 'Aucun rôle'}</span>
+                `;
+
+                document.getElementById('editUserRoleModal').style.display = 'block';
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement des données utilisateur');
+            }
+        }
+
+        function closeEditUserRoleModal() {
+            document.getElementById('editUserRoleModal').style.display = 'none';
+        }
+
+        // Charger les rôles disponibles
+        async function loadAvailableRoles() {
+            const roles = [
+                { id: 1, name: 'admin', display_name: 'Administrateur', description: 'Accès complet au système' },
+                { id: 2, name: 'hr_manager', display_name: 'Responsable RH', description: 'Gestion des candidatures et utilisateurs' },
+                { id: 3, name: 'recruiter', display_name: 'Recruteur', description: 'Gestion des candidatures' },
+                { id: 4, name: 'senior_recruiter', display_name: 'Recruteur Senior', description: 'Gestion avancée des candidatures' },
+                { id: 5, name: 'analyst', display_name: 'Analyste RH', description: 'Analyse des CV et rapports' },
+                { id: 6, name: 'viewer', display_name: 'Observateur', description: 'Lecture seule' }
+            ];
+
+            const select = document.getElementById('newUserRole');
+            select.innerHTML = '<option value="">Sélectionner un rôle...</option>';
+
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = `${role.display_name} - ${role.description}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Gestion des rôles et permissions
+        function showRolesManagement() {
+            loadRolesAndPermissions();
+            document.getElementById('rolesModal').style.display = 'block';
+        }
+
+        function closeRolesModal() {
+            document.getElementById('rolesModal').style.display = 'none';
+        }
+
+        async function loadRolesAndPermissions() {
+            const roles = [
+                {
+                    id: 1,
+                    name: 'admin',
+                    display_name: 'Administrateur',
+                    description: 'Accès complet au système',
+                    permissions: ['*'],
+                    color: '#e74c3c'
+                },
+                {
+                    id: 2,
+                    name: 'hr_manager',
+                    display_name: 'Responsable RH',
+                    description: 'Gestion des candidatures et utilisateurs',
+                    permissions: ['manage_candidates', 'manage_users', 'view_reports', 'manage_job_offers'],
+                    color: '#3498db'
+                },
+                {
+                    id: 3,
+                    name: 'recruiter',
+                    display_name: 'Recruteur',
+                    description: 'Gestion des candidatures',
+                    permissions: ['view_candidates', 'manage_candidates', 'view_job_offers'],
+                    color: '#27ae60'
+                },
+                {
+                    id: 4,
+                    name: 'senior_recruiter',
+                    display_name: 'Recruteur Senior',
+                    description: 'Gestion avancée des candidatures',
+                    permissions: ['view_candidates', 'manage_candidates', 'view_job_offers', 'manage_job_offers', 'view_reports'],
+                    color: '#f39c12'
+                },
+                {
+                    id: 5,
+                    name: 'analyst',
+                    display_name: 'Analyste RH',
+                    description: 'Analyse des CV et rapports',
+                    permissions: ['view_candidates', 'view_analyses', 'view_reports'],
+                    color: '#9b59b6'
+                },
+                {
+                    id: 6,
+                    name: 'viewer',
+                    display_name: 'Observateur',
+                    description: 'Lecture seule',
+                    permissions: ['view_candidates', 'view_job_offers'],
+                    color: '#95a5a6'
+                }
+            ];
+
+            displayRoles(roles);
+        }
+
+        function displayRoles(roles) {
+            const container = document.getElementById('rolesList');
+
+            container.innerHTML = roles.map(role => `
+                <div class="role-card" onclick="selectRole(${role.id})" style="
+                    padding: 1rem;
+                    margin-bottom: 0.5rem;
+                    border: 2px solid #e9ecef;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    border-left: 4px solid ${role.color};
+                " onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='white'">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: ${role.color};">${role.display_name}</strong>
+                            <br><small style="color: #7f8c8d;">${role.description}</small>
+                        </div>
+                        <span class="badge" style="background: ${role.color}; color: white;">
+                            ${role.permissions.includes('*') ? 'Toutes' : role.permissions.length} permissions
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectRole(roleId) {
+            const roles = [
+                {
+                    id: 1,
+                    name: 'admin',
+                    display_name: 'Administrateur',
+                    permissions: ['*'],
+                    description: 'Accès complet au système'
+                },
+                {
+                    id: 2,
+                    name: 'hr_manager',
+                    display_name: 'Responsable RH',
+                    permissions: ['manage_candidates', 'manage_users', 'view_reports', 'manage_job_offers'],
+                    description: 'Gestion des candidatures et utilisateurs'
+                },
+                {
+                    id: 3,
+                    name: 'recruiter',
+                    display_name: 'Recruteur',
+                    permissions: ['view_candidates', 'manage_candidates', 'view_job_offers'],
+                    description: 'Gestion des candidatures'
+                },
+                {
+                    id: 4,
+                    name: 'senior_recruiter',
+                    display_name: 'Recruteur Senior',
+                    permissions: ['view_candidates', 'manage_candidates', 'view_job_offers', 'manage_job_offers', 'view_reports'],
+                    description: 'Gestion avancée des candidatures'
+                },
+                {
+                    id: 5,
+                    name: 'analyst',
+                    display_name: 'Analyste RH',
+                    permissions: ['view_candidates', 'view_analyses', 'view_reports'],
+                    description: 'Analyse des CV et rapports'
+                },
+                {
+                    id: 6,
+                    name: 'viewer',
+                    display_name: 'Observateur',
+                    permissions: ['view_candidates', 'view_job_offers'],
+                    description: 'Lecture seule'
+                }
+            ];
+
+            const role = roles.find(r => r.id === roleId);
+            if (!role) return;
+
+            displayRolePermissions(role);
+        }
+
+        function displayRolePermissions(role) {
+            const container = document.getElementById('permissionsList');
+
+            const allPermissions = {
+                '*': { name: 'Toutes les permissions', description: 'Accès administrateur complet', icon: 'fas fa-crown', color: '#e74c3c' },
+                'manage_candidates': { name: 'Gérer les candidats', description: 'Créer, modifier, supprimer des candidatures', icon: 'fas fa-users', color: '#3498db' },
+                'view_candidates': { name: 'Voir les candidats', description: 'Consulter les candidatures', icon: 'fas fa-eye', color: '#27ae60' },
+                'manage_users': { name: 'Gérer les utilisateurs', description: 'Créer, modifier, supprimer des utilisateurs', icon: 'fas fa-user-cog', color: '#f39c12' },
+                'view_users': { name: 'Voir les utilisateurs', description: 'Consulter la liste des utilisateurs', icon: 'fas fa-users', color: '#95a5a6' },
+                'manage_job_offers': { name: 'Gérer les offres', description: 'Créer, modifier, supprimer des offres d\'emploi', icon: 'fas fa-briefcase', color: '#9b59b6' },
+                'view_job_offers': { name: 'Voir les offres', description: 'Consulter les offres d\'emploi', icon: 'fas fa-list', color: '#16a085' },
+                'view_analyses': { name: 'Voir les analyses', description: 'Consulter les analyses IA', icon: 'fas fa-brain', color: '#e67e22' },
+                'view_reports': { name: 'Voir les rapports', description: 'Accéder aux statistiques et rapports', icon: 'fas fa-chart-bar', color: '#34495e' }
+            };
+
+            let html = `
+                <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: ${role.color || '#2c3e50'}; margin-bottom: 0.5rem;">
+                        ${role.display_name}
+                    </h4>
+                    <p style="color: #7f8c8d; margin: 0;">${role.description}</p>
+                </div>
+            `;
+
+            if (role.permissions.includes('*')) {
+                html += `
+                    <div style="padding: 1rem; background: #fee; border: 2px solid #e74c3c; border-radius: 8px; text-align: center;">
+                        <i class="fas fa-crown" style="font-size: 2rem; color: #e74c3c; margin-bottom: 0.5rem;"></i>
+                        <h4 style="color: #e74c3c; margin: 0;">ACCÈS ADMINISTRATEUR COMPLET</h4>
+                        <p style="color: #721c24; margin: 0.5rem 0 0 0;">Toutes les permissions du système</p>
+                    </div>
+                `;
+            } else {
+                html += '<div style="display: grid; gap: 0.5rem;">';
+
+                role.permissions.forEach(permission => {
+                    const perm = allPermissions[permission];
+                    if (perm) {
+                        html += `
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                gap: 0.75rem;
+                                padding: 0.75rem;
+                                background: white;
+                                border: 1px solid #e9ecef;
+                                border-radius: 6px;
+                                border-left: 3px solid ${perm.color};
+                            ">
+                                <i class="${perm.icon}" style="color: ${perm.color}; width: 20px;"></i>
+                                <div>
+                                    <strong style="color: #2c3e50;">${perm.name}</strong>
+                                    <br><small style="color: #7f8c8d;">${perm.description}</small>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Obtenir la couleur d'un rôle
+        function getRoleColor(roleName) {
+            const roleColors = {
+                'super_admin': '#dc2626',     // Rouge
+                'admin': '#ea580c',           // Orange foncé
+                'hr_director': '#7c3aed',     // Violet
+                'hr_manager': '#2563eb',      // Bleu
+                'senior_recruiter': '#059669', // Vert foncé
+                'recruiter': '#0891b2',       // Cyan
+                'junior_recruiter': '#4f46e5', // Indigo
+                'analyst': '#9333ea',         // Violet clair
+                'viewer': '#6b7280'           // Gris
+            };
+            return roleColors[roleName] || '#6b7280';
+        }
+
+        // Obtenir les permissions d'un rôle
+        function getRolePermissions(roleName) {
+            const rolePermissions = {
+                'super_admin': ['Toutes les permissions', 'Gestion système', 'Administration complète'],
+                'admin': ['Gestion utilisateurs', 'Gestion candidats', 'Configuration système'],
+                'hr_director': ['Vue globale RH', 'Rapports avancés', 'Validation finale'],
+                'hr_manager': ['Gestion équipe RH', 'Suivi candidatures', 'Rapports'],
+                'senior_recruiter': ['Gestion candidats', 'Entretiens', 'Évaluations'],
+                'recruiter': ['Consultation candidats', 'Entretiens', 'Évaluations basiques'],
+                'junior_recruiter': ['Consultation candidats', 'Assistance entretiens'],
+                'analyst': ['Analyses données', 'Rapports', 'Statistiques'],
+                'viewer': ['Consultation uniquement', 'Vue limitée']
+            };
+            return rolePermissions[roleName] || ['Permissions non définies'];
+        }
+
+        // Obtenir le rôle de l'utilisateur actuel
+        function getCurrentUserRole() {
+            const user = UserManager.getUser();
+            return user && user.role ? user.role.name : 'viewer';
+        }
+
+        // Vérifier si l'utilisateur a une permission
+        function hasPermission(permission) {
+            const user = UserManager.getUser();
+            console.log('🔍 DEBUG hasPermission - User:', user);
+            console.log('🔍 DEBUG hasPermission - Permission demandée:', permission);
+
+            if (!user || !user.role) {
+                console.log('❌ DEBUG hasPermission - Pas d\'utilisateur ou de rôle');
+                return false;
+            }
+
+            const roleName = user.role.name;
+            console.log('🔍 DEBUG hasPermission - Rôle utilisateur:', roleName);
+
+            // Définir les permissions par rôle
+            const rolePermissions = {
+                'super_admin': ['*'], // Toutes les permissions
+                'admin': ['*'], // Toutes les permissions
+                'hr_director': [
+                    'view_candidates', 'manage_candidates', 'view_users', 'manage_users',
+                    'view_analyses', 'manage_analyses', 'view_reports', 'send_emails'
+                ],
+                'hr_manager': [
+                    'view_candidates', 'manage_candidates', 'view_users',
+                    'view_analyses', 'manage_analyses', 'view_reports', 'send_emails'
+                ],
+                'senior_recruiter': [
+                    'view_candidates', 'manage_candidates', 'view_analyses',
+                    'manage_analyses', 'send_emails'
+                ],
+                'recruiter': [
+                    'view_candidates', 'manage_candidates', 'view_analyses', 'send_emails'
+                ],
+                'junior_recruiter': [
+                    'view_candidates', 'view_analyses'
+                ],
+                'analyst': [
+                    'view_candidates', 'view_users', 'view_analyses', 'view_reports'
+                ],
+                'viewer': [
+                    'view_candidates', 'view_analyses'
+                ]
+            };
+
+            const userPermissions = rolePermissions[roleName] || [];
+            console.log('🔍 DEBUG hasPermission - Permissions du rôle:', userPermissions);
+
+            // Vérifier si l'utilisateur a toutes les permissions (*)
+            if (userPermissions.includes('*')) {
+                console.log('✅ DEBUG hasPermission - Utilisateur a toutes les permissions (*)');
+                return true;
+            }
+
+            // Vérifier la permission spécifique
+            const hasSpecificPermission = userPermissions.includes(permission);
+            console.log(`🔍 DEBUG hasPermission - A la permission "${permission}":`, hasSpecificPermission);
+            return hasSpecificPermission;
+        }
+
+        // Fonctions pour les actions sur les candidats
+        function downloadCandidateCV(candidateId) {
+            alert(`📄 Téléchargement du CV pour le candidat ${candidateId}\n\nFonctionnalité en développement...`);
+        }
+
+        function sendEmailToCandidate(candidateId) {
+            alert(`📧 Envoi d'email au candidat ${candidateId}\n\nFonctionnalité en développement...`);
+        }
+
+        function addCandidateNote(candidateId) {
+            const note = prompt('📝 Ajouter une note pour ce candidat:');
+            if (note) {
+                alert(`Note ajoutée: "${note}"\n\nFonctionnalité en développement...`);
+            }
+        }
+
+        // Fonctions pour les actions sur les utilisateurs
+        function toggleUserStatus(userId) {
+            if (confirm('Êtes-vous sûr de vouloir changer le statut de cet utilisateur ?')) {
+                alert(`🔄 Changement de statut pour l'utilisateur ${userId}\n\nFonctionnalité en développement...`);
+            }
+        }
+
+        function sendEmailToUser(userId) {
+            alert(`📧 Envoi d'email à l'utilisateur ${userId}\n\nFonctionnalité en développement...`);
+        }
+
+        function viewUserActivity(userId) {
+            alert(`📊 Activité de l'utilisateur ${userId}\n\nFonctionnalité en développement...`);
+        }
+
+
+
+        async function triggerAIAnalysis() {
+            if (aiAnalysisInProgress) {
+                alert('⏳ Une analyse IA est déjà en cours...');
+                return;
+            }
+
+            const pendingCount = currentCVAnalyses.filter(a => a.analysis_status === 'pending').length;
+
+            if (pendingCount === 0) {
+                alert('ℹ️ Aucun CV en attente d\'analyse.');
+                return;
+            }
+
+            if (!confirm(`🤖 Lancer l'analyse IA pour ${pendingCount} CV(s) en attente ?`)) {
+                return;
+            }
+
+            aiAnalysisInProgress = true;
+
+            try {
+                const response = await fetch('/api/cv-analyses/trigger-batch', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`✅ Analyse IA lancée pour ${result.data.count} CV(s). Les résultats apparaîtront progressivement.`);
+                        loadDashboardData(); // Recharger les données
+                    } else {
+                        alert('❌ Erreur: ' + (result.message || 'Erreur inconnue'));
+                    }
+                } else {
+                    alert('❌ Erreur lors du lancement de l\'analyse IA');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur de connexion');
+            } finally {
+                aiAnalysisInProgress = false;
+            }
+        }
+
+        async function triggerSingleAnalysis(analysisId) {
+            try {
+                const response = await fetch(`/api/cv-analyses/${analysisId}/trigger`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('✅ Analyse IA lancée ! Les résultats apparaîtront dans quelques instants.');
+                        loadCVAnalyses(); // Recharger les analyses
+                    } else {
+                        alert('❌ Erreur: ' + (result.message || 'Erreur inconnue'));
+                    }
+                } else {
+                    alert('❌ Erreur lors du lancement de l\'analyse');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur de connexion');
+            }
+        }
+
+        function showAnalysisDetails(analysisId) {
+            const analysis = currentCVAnalyses.find(a => a.id === analysisId);
+            if (!analysis) return;
+
+            const modal = document.getElementById('analysisModal');
+            const detailsContainer = document.getElementById('analysisDetails');
+
+            detailsContainer.innerHTML = `
+                <h2>🧠 Analyse IA - ${analysis.candidate_name || 'Candidat'}</h2>
+
+                <div class="analysis-section">
+                    <h4>📊 Score de correspondance</h4>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="score-circle ${getScoreClass(analysis.job_match_score)}" style="width: 60px; height: 60px; font-size: 1.25rem;">
+                            ${analysis.job_match_score}%
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600;">${getScoreDescription(analysis.job_match_score)}</p>
+                            <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem;">Note globale: ${analysis.overall_rating || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h4>👤 Résumé du profil</h4>
+                    <p>${analysis.profile_summary || 'Non disponible'}</p>
+                </div>
+
+                ${analysis.key_skills ? `
+                    <div class="analysis-section">
+                        <h4>🛠️ Compétences clés</h4>
+                        <div class="skills-list">
+                            ${JSON.parse(analysis.key_skills).map(skill =>
+                                `<span class="skill-tag">${skill}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${analysis.experience ? `
+                    <div class="analysis-section">
+                        <h4>💼 Expérience</h4>
+                        ${JSON.parse(analysis.experience).map(exp => `
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>${exp.title || exp.position}</strong> - ${exp.company}
+                                ${exp.years ? `<span style="color: var(--gray-600);"> (${exp.years} ans)</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                ${analysis.education ? `
+                    <div class="analysis-section">
+                        <h4>🎓 Formation</h4>
+                        ${JSON.parse(analysis.education).map(edu => `
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong>${edu.degree}</strong> - ${edu.school || edu.institution}
+                                ${edu.year ? `<span style="color: var(--gray-600);"> (${edu.year})</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="analysis-section">
+                    <h4>🎯 Analyse de correspondance</h4>
+                    <p>${analysis.job_match_analysis || 'Non disponible'}</p>
+                </div>
+
+                <div class="analysis-section">
+                    <h4>📈 Informations techniques</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem;">
+                        <div>Tokens utilisés: <strong>${analysis.tokens_used || 'N/A'}</strong></div>
+                        <div>Coût estimé: <strong>$${analysis.cost_estimate || '0.00'}</strong></div>
+                        <div>Analysé le: <strong>${formatDate(analysis.analyzed_at)}</strong></div>
+                        <div>Statut: <strong>${getStatusLabel(analysis.analysis_status)}</strong></div>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        // Fonctions utilitaires
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'En attente',
+                'processing': 'En cours',
+                'completed': 'Terminé',
+                'failed': 'Échoué'
+            };
+            return labels[status] || status;
+        }
+
+        function getScoreClass(score) {
+            if (score >= 80) return 'score-excellent';
+            if (score >= 60) return 'score-good';
+            if (score >= 40) return 'score-average';
+            return 'score-poor';
+        }
+
+        function getScoreDescription(score) {
+            if (score >= 80) return 'Excellent candidat';
+            if (score >= 60) return 'Bon candidat';
+            if (score >= 40) return 'Candidat moyen';
+            return 'Candidat faible';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showJobPositions() {
+            loadJobOffers();
+            document.getElementById('jobOffersTable').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Nouvelles fonctions pour la pagination et les filtres des candidats
+        function sortCandidatesBy(column) {
+            if (candidatesFilters.sort_by === column) {
+                candidatesFilters.sort_order = candidatesFilters.sort_order === 'asc' ? 'desc' : 'asc';
+            } else {
+                candidatesFilters.sort_by = column;
+                candidatesFilters.sort_order = 'asc';
+            }
+            loadCandidates(1, candidatesFilters);
+        }
+
+        function applyCandidateFilters() {
+            candidatesFilters.status = document.getElementById('candidateStatusFilter').value;
+            candidatesFilters.job_offer_id = document.getElementById('jobOfferFilter').value;
+            loadCandidates(1, candidatesFilters);
+        }
+
+        function changeCandidatesPerPage() {
+            candidatesPerPage = parseInt(document.getElementById('candidatesPerPage').value);
+            loadCandidates(1, candidatesFilters);
+        }
+
+        // Fonction debounce pour la recherche
+        let searchTimeout;
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                candidatesFilters.search = document.getElementById('candidateSearch').value;
+                loadCandidates(1, candidatesFilters);
+            }, 500);
+        }
+
+        async function exportCandidates() {
+            try {
+                const params = new URLSearchParams(candidatesFilters);
+                const token = TokenManager.getToken();
+
+                const response = await fetch(`/api/candidates/export?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'text/csv'
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `candidats_export_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erreur lors de l\'export');
+                }
+            } catch (error) {
+                console.error('Erreur export:', error);
+                alert('Erreur lors de l\'export');
+            }
+        }
+
+        // Variables pour la pagination des offres
+        let currentOffersPage = 1;
+        let offersPerPage = 5;
+
+        // Fonctions pour la gestion des offres d'emploi
+        async function loadJobOffers(page = 1) {
+            try {
+                const token = TokenManager.getToken();
+                if (!token) {
+                    window.location.href = 'auth/login.html';
+                    return;
+                }
+
+                document.getElementById('jobOffersTable').innerHTML = '<div class="loading">Chargement des offres...</div>';
+
+                const response = await fetch(`/api/job-offers?page=${page}&per_page=${offersPerPage}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayJobOffers(result.data || [], result.pagination || {});
+                    populateJobOfferFilter(result.data || []);
+                    currentOffersPage = page;
+                } else {
+                    document.getElementById('jobOffersTable').innerHTML =
+                        '<div class="error">Erreur lors du chargement des offres</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('jobOffersTable').innerHTML =
+                    '<div class="error">Erreur de connexion</div>';
+            }
+        }
+
+        function populateJobOfferFilter(offers) {
+            const select = document.getElementById('jobOfferFilter');
+            select.innerHTML = '<option value="all">Toutes les offres</option>';
+
+            offers.forEach(offer => {
+                const option = document.createElement('option');
+                option.value = offer.id;
+                option.textContent = `${offer.title} (${offer.company_name})`;
+                select.appendChild(option);
+            });
+        }
+
+        function displayJobOffers(offers, pagination = {}) {
+            const container = document.getElementById('jobOffersTable');
+
+            if (offers.length === 0) {
+                container.innerHTML = '<div class="no-data">Aucune offre d\'emploi trouvée</div>';
+                return;
+            }
+
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Entreprise</th>
+                            <th>Type</th>
+                            <th>Localisation</th>
+                            <th>Candidatures</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            offers.forEach(offer => {
+                const candidatesCount = offer.candidates_count || 0;
+                const isActive = offer.status === 'active';
+                const statusBadge = isActive ?
+                    '<span class="badge badge-success">🟢 Active</span>' :
+                    '<span class="badge badge-danger">🔴 Inactive</span>';
+
+                html += `
+                    <tr>
+                        <td><strong>#${offer.id}</strong></td>
+                        <td>
+                            <div>
+                                <strong>${offer.title}</strong>
+                                <br><small style="color: #7f8c8d;">${offer.contract_type}</small>
+                            </div>
+                        </td>
+                        <td>${offer.company_name}</td>
+                        <td>
+                            <span class="badge ${offer.type === 'emploi' ? 'badge-primary' : 'badge-info'}">
+                                ${offer.type === 'emploi' ? '💼 Emploi' : '🎓 Stage'}
+                            </span>
+                        </td>
+                        <td>📍 ${offer.location}</td>
+                        <td>
+                            <strong>${candidatesCount}</strong> candidature${candidatesCount > 1 ? 's' : ''}
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <button onclick="viewOfferDetails(${offer.id})" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </button>
+                                <button onclick="editOffer(${offer.id})" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button onclick="toggleOfferStatus(${offer.id}, ${!isActive})"
+                                        class="btn btn-sm ${isActive ? 'btn-warning' : 'btn-success'}">
+                                    <i class="fas fa-${isActive ? 'pause' : 'play'}"></i>
+                                    ${isActive ? 'Désactiver' : 'Activer'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            // Ajouter la pagination si disponible
+            if (pagination && pagination.last_page > 1) {
+                html += generateOffersPagination(pagination);
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Générer la pagination pour les offres
+        function generateOffersPagination(pagination) {
+            let paginationHTML = '<div class="pagination-container" style="margin-top: 20px; text-align: center;">';
+
+            paginationHTML += `
+                <div class="pagination-info" style="margin-bottom: 15px; color: #7f8c8d;">
+                    Affichage de ${pagination.from || 0} à ${pagination.to || 0} sur ${pagination.total} offres
+                </div>
+            `;
+
+            paginationHTML += '<div class="pagination" style="display: inline-flex; gap: 5px; align-items: center;">';
+
+            // Bouton précédent
+            if (pagination.current_page > 1) {
+                paginationHTML += `
+                    <button onclick="loadJobOffers(${pagination.current_page - 1})" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-chevron-left"></i> Précédent
+                    </button>
+                `;
+            }
+
+            // Numéros de page (limités)
+            const startPage = Math.max(1, pagination.current_page - 1);
+            const endPage = Math.min(pagination.last_page, pagination.current_page + 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === pagination.current_page;
+                paginationHTML += `
+                    <button onclick="loadJobOffers(${i})"
+                            class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline'}"
+                            ${isActive ? 'style="background: #3498db; color: white;"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // Bouton suivant
+            if (pagination.current_page < pagination.last_page) {
+                paginationHTML += `
+                    <button onclick="loadJobOffers(${pagination.current_page + 1})" class="btn btn-sm btn-secondary">
+                        Suivant <i class="fas fa-chevron-right"></i>
+                    </button>
+                `;
+            }
+
+            paginationHTML += '</div></div>';
+
+            return paginationHTML;
+        }
+
+        function applyOfferFilters() {
+            // Implémenter les filtres pour les offres
+            loadJobOffers();
+        }
+
+        function showCreateOfferModal() {
+            document.getElementById('createOfferModal').style.display = 'block';
+            // Réinitialiser le formulaire
+            document.getElementById('createOfferForm').reset();
+        }
+
+        function closeCreateOfferModal() {
+            document.getElementById('createOfferModal').style.display = 'none';
+        }
+
+        function viewOfferDetails(offerId) {
+            alert(`🚧 Voir les détails de l'offre #${offerId} - À implémenter`);
+        }
+
+        function editOffer(offerId) {
+            alert(`🚧 Modifier l'offre #${offerId} - À implémenter`);
+        }
+
+        async function toggleOfferStatus(offerId, newStatus) {
+            const statusText = newStatus ? 'Activer' : 'Désactiver';
+            if (!confirm(`${statusText} cette offre d'emploi ?`)) return;
+
+            try {
+                const token = TokenManager.getToken();
+                const response = await fetch(`/api/admin/job-offers/${offerId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus ? 'active' : 'inactive'
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Statut de l\'offre mis à jour !');
+                    loadJobOffers();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Erreur API:', errorData);
+                    alert('Erreur lors de la mise à jour: ' + (errorData.message || 'Erreur inconnue'));
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la mise à jour');
+            }
+        }
+
+        async function triggerAnalysis(candidateId) {
+            if (!confirm('Déclencher l\'analyse IA pour ce candidat ?')) return;
+
+            try {
+                const token = TokenManager.getToken();
+                const response = await fetch(`/api/cv-analyses/${candidateId}/trigger`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Analyse déclenchée avec succès !');
+                    loadCandidates(currentCandidatesPage);
+                } else {
+                    alert('Erreur lors du déclenchement de l\'analyse');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du déclenchement de l\'analyse');
+            }
+        }
+
+        function viewAnalysis(analysisId) {
+            alert(`🚧 Voir l'analyse #${analysisId} - À implémenter`);
+        }
+
+        // Gestionnaire de création d'offre
+        async function handleCreateOffer(event) {
+            event.preventDefault();
+
+            const formData = {
+                title: document.getElementById('offerTitle').value,
+                type: document.getElementById('offerType').value,
+                company_name: document.getElementById('companyName').value,
+                location: document.getElementById('offerLocation').value,
+                contract_type: document.getElementById('contractType').value,
+                experience_level: document.getElementById('experienceLevel').value,
+                salary_range: document.getElementById('salaryRange').value,
+                description: document.getElementById('offerDescription').value,
+                requirements: document.getElementById('offerRequirements').value,
+                contact_email: document.getElementById('contactEmail').value,
+                positions_available: document.getElementById('positionsAvailable').value || 1,
+                application_deadline: document.getElementById('applicationDeadline').value,
+                company_description: document.getElementById('companyDescription').value,
+                status: 'active'
+            };
+
+            try {
+                const token = TokenManager.getToken();
+                const response = await fetch('/api/admin/job-offers', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('✅ Offre créée avec succès !');
+                    closeCreateOfferModal();
+                    loadJobOffers(1);
+                } else {
+                    const errorData = await response.json();
+                    alert('❌ Erreur lors de la création: ' + (errorData.message || 'Erreur inconnue'));
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la création de l\'offre');
+            }
+        }
+
+        // Gestionnaire de modification de rôle
+        async function handleUserRoleChange(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById('userIdForRole').value;
+            const newRoleId = document.getElementById('newUserRole').value;
+            const reason = document.getElementById('roleChangeReason').value;
+
+            if (!newRoleId) {
+                alert('Veuillez sélectionner un rôle');
+                return;
+            }
+
+            try {
+                const token = TokenManager.getToken();
+                const response = await fetch(`/api/backend/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        role_id: newRoleId,
+                        reason: reason
+                    })
+                });
+
+                if (response.ok) {
+                    alert('✅ Rôle modifié avec succès !');
+                    closeEditUserRoleModal();
+                    loadUsers(currentUsersPage);
+                } else {
+                    const errorData = await response.json();
+                    alert('❌ Erreur lors de la modification: ' + (errorData.message || 'Erreur inconnue'));
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la modification du rôle');
+            }
+        }
+
+        function exportResults() {
+            alert('🚧 Fonctionnalité en développement - Export des résultats');
+        }
+
+        function refreshDashboard() {
+            console.log('🔄 Actualisation du dashboard CV Filtering...');
+            loadDashboardData();
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/backend/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + TokenManager.getToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.log('Erreur lors de la déconnexion API');
+            }
+
+            TokenManager.clearToken();
+            UserManager.clearUser();
+            window.location.href = 'auth/login.html';
+        }
+    </script>
+</body>
+</html>

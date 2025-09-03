@@ -1,0 +1,40 @@
+<!-- CV Filtering System - AI-Powered Application -->
+<div class="app-container">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">
+        <span class="title-icon">🤖</span>
+        Système de Filtrage CV IA
+      </h1>
+      <p class="app-subtitle">
+        Plateforme intelligente d'analyse automatique des candidatures
+      </p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="app-navigation">
+      <a routerLink="/offers" routerLinkActive="active" class="nav-link">
+        🚀 Offres d'Emploi
+      </a>
+      <a routerLink="/apply" routerLinkActive="active" class="nav-link">
+        📤 Postuler
+      </a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>&copy; 2024 CV Filtering System - Powered by AI</p>
+  </footer>
+</div>
+
+<!-- Notifications -->
+<app-notification></app-notification>
+
+

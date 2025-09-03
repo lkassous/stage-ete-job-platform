@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Laravel Passport</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Test API Laravel Passport</h1>
+
+    <!-- Section Inscription -->
+    <div class="container">
+        <h2>📝 Inscription</h2>
+        <div class="form-group">
+            <label for="reg_name">Nom :</label>
+            <input type="text" id="reg_name" value="John Doe">
+        </div>
+        <div class="form-group">
+            <label for="reg_email">Email :</label>
+            <input type="email" id="reg_email" value="">
+        </div>
+        <div class="form-group">
+            <label for="reg_password">Mot de passe :</label>
+            <input type="password" id="reg_password" value="password123">
+        </div>
+        <div class="form-group">
+            <label for="reg_password_confirmation">Confirmer le mot de passe :</label>
+            <input type="password" id="reg_password_confirmation" value="password123">
+        </div>
+        <div class="form-group">
+            <label for="reg_role">Rôle :</label>
+            <select id="reg_role">
+                <option value="recruiter">Recruiter</option>
+                <option value="candidate">Candidate</option>
+            </select>
+        </div>
+        <button onclick="register()">S'inscrire</button>
+        <div id="register_response" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Section Connexion -->
+    <div class="container">
+        <h2>🔑 Connexion</h2>
+        <div class="form-group">
+            <label for="login_email">Email :</label>
+            <input type="email" id="login_email" value="john@example.com">
+        </div>
+        <div class="form-group">
+            <label for="login_password">Mot de passe :</label>
+            <input type="password" id="login_password" value="password123">
+        </div>
+        <button onclick="login()">Se connecter</button>
+        <div id="login_response" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Section Utilisateur connecté -->
+    <div class="container">
+        <h2>👤 Profil utilisateur</h2>
+        <div class="form-group">
+            <label for="token">Token d'accès :</label>
+            <input type="text" id="token" placeholder="Token sera rempli automatiquement après connexion">
+        </div>
+        <button onclick="getUser()">Obtenir profil</button>
+        <button onclick="logout()">Se déconnecter</button>
+        <div id="user_response" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let accessToken = '';
+
+        async function makeRequest(endpoint, method = 'GET', data = null, useAuth = false) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            };
+
+            if (useAuth && accessToken) {
+                options.headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json();
+                return { status: response.status, data: result };
+            } catch (error) {
+                return { status: 0, data: { error: error.message } };
+            }
+        }
+
+        function showResponse(elementId, response, isSuccess = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(response, null, 2);
+        }
+
+        // Générer un email unique au chargement de la page
+        window.onload = function() {
+            const timestamp = new Date().getTime();
+            document.getElementById('reg_email').value = `user${timestamp}@example.com`;
+            document.getElementById('login_email').value = `user${timestamp}@example.com`;
+        };
+
+        async function register() {
+            const data = {
+                name: document.getElementById('reg_name').value,
+                email: document.getElementById('reg_email').value,
+                password: document.getElementById('reg_password').value,
+                password_confirmation: document.getElementById('reg_password_confirmation').value,
+                role_name: document.getElementById('reg_role').value
+            };
+
+            const response = await makeRequest('/auth/register', 'POST', data);
+            const isSuccess = response.status === 201;
+            
+            if (isSuccess && response.data.data && response.data.data.access_token) {
+                accessToken = response.data.data.access_token;
+                document.getElementById('token').value = accessToken;
+            }
+
+            showResponse('register_response', response.data, isSuccess);
+        }
+
+        async function login() {
+            const data = {
+                email: document.getElementById('login_email').value,
+                password: document.getElementById('login_password').value
+            };
+
+            const response = await makeRequest('/auth/login', 'POST', data);
+            const isSuccess = response.status === 200;
+            
+            if (isSuccess && response.data.data && response.data.data.access_token) {
+                accessToken = response.data.data.access_token;
+                document.getElementById('token').value = accessToken;
+            }
+
+            showResponse('login_response', response.data, isSuccess);
+        }
+
+        async function getUser() {
+            const token = document.getElementById('token').value;
+            if (token) {
+                accessToken = token;
+            }
+
+            const response = await makeRequest('/auth/user', 'GET', null, true);
+            const isSuccess = response.status === 200;
+            showResponse('user_response', response.data, isSuccess);
+        }
+
+        async function logout() {
+            const response = await makeRequest('/auth/logout', 'POST', null, true);
+            const isSuccess = response.status === 200;
+            
+            if (isSuccess) {
+                accessToken = '';
+                document.getElementById('token').value = '';
+            }
+
+            showResponse('user_response', response.data, isSuccess);
+        }
+    </script>
+</body>
+</html>

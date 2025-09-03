@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - CV Filtering System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="filament-style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <a href="#" class="app-logo">
+                    <i class="fas fa-filter"></i>
+                    CV Filtering System
+                </a>
+                <nav class="header-nav">
+                    <a href="login.html" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Se connecter
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <div class="auth-card card" style="max-width: 32rem;">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <i class="fas fa-user-shield"></i>
+                        Créer un compte
+                    </h1>
+                    <p class="card-description">
+                        Rejoignez l'équipe de gestion des candidatures
+                    </p>
+
+                    <!-- Boutons de debug temporaires -->
+                    <div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; border: 1px solid #dee2e6;">
+                        <small style="color: #666;">🔧 Debug:</small>
+                        <button type="button" onclick="loadAvailableRoles()" style="margin: 0 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                            🔄 Charger les rôles
+                        </button>
+                        <button type="button" onclick="testAPI()" style="margin: 0 5px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                            📡 Test API
+                        </button>
+                        <button type="button" onclick="showSelectInfo()" style="margin: 0 5px; padding: 5px 10px; background: #ffc107; color: black; border: none; border-radius: 3px; cursor: pointer;">
+                            📋 Info Select
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <form id="registerForm" class="auth-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Prénom
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="first_name" 
+                                    name="first_name" 
+                                    class="form-input" 
+                                    placeholder="Votre prénom"
+                                    required
+                                >
+                                <div class="field-error" id="first_name-error" style="display: none;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Nom
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="last_name" 
+                                    name="last_name" 
+                                    class="form-input" 
+                                    placeholder="Votre nom"
+                                    required
+                                >
+                                <div class="field-error" id="last_name-error" style="display: none;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Adresse email
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input" 
+                                placeholder="votre.email@entreprise.com"
+                                required
+                            >
+                            <div class="field-error" id="email-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    Téléphone
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    id="phone" 
+                                    name="phone" 
+                                    class="form-input" 
+                                    placeholder="+33 1 23 45 67 89"
+                                >
+                                <div class="field-error" id="phone-error" style="display: none;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="role_name" class="form-label">
+                                    <i class="fas fa-user-tag"></i>
+                                    Rôle
+                                </label>
+                                <select id="role_name" name="role_name" class="form-select" required>
+                                    <option value="">🔄 Chargement des rôles...</option>
+                                    <!-- Les rôles seront chargés dynamiquement -->
+                                </select>
+                                <small style="color: #666; font-size: 0.8em;">
+                                    <button type="button" onclick="loadAvailableRoles()" style="background: none; border: none; color: #007bff; cursor: pointer; text-decoration: underline; font-size: 0.8em;">
+                                        🔄 Recharger les rôles
+                                    </button>
+                                </small>
+                                <div class="field-error" id="role_name-error" style="display: none;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="linkedin_url" class="form-label">
+                                <i class="fab fa-linkedin"></i>
+                                LinkedIn (optionnel)
+                            </label>
+                            <input 
+                                type="url" 
+                                id="linkedin_url" 
+                                name="linkedin_url" 
+                                class="form-input" 
+                                placeholder="https://linkedin.com/in/votre-profil"
+                            >
+                            <div class="field-error" id="linkedin_url-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Mot de passe
+                            </label>
+                            <div class="password-field">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-input" 
+                                    placeholder="Minimum 8 caractères"
+                                    required
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <div class="field-error" id="password-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password_confirmation" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Confirmer le mot de passe
+                            </label>
+                            <div class="password-field">
+                                <input 
+                                    type="password" 
+                                    id="password_confirmation" 
+                                    name="password_confirmation" 
+                                    class="form-input" 
+                                    placeholder="Répétez votre mot de passe"
+                                    required
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="field-error" id="password_confirmation-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" id="registerBtn" class="btn btn-primary btn-full">
+                                <i class="fas fa-user-shield"></i>
+                                Créer mon compte
+                            </button>
+                        </div>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                        <p style="color: var(--gray-600); font-size: 0.875rem;">
+                            Vous avez déjà un compte ? 
+                            <a href="login.html" style="color: var(--primary-600); text-decoration: none; font-weight: 600;">
+                                Se connecter
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2025 CV Filtering System. Interface d'administration sécurisée.</p>
+        </footer>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification" class="notification" style="display: none;">
+        <div id="notification-content"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM chargé, initialisation...');
+            initializeRegisterForm();
+
+            // Charger les rôles immédiatement
+            loadAvailableRoles();
+        });
+
+        // Backup: charger les rôles après le chargement complet de la page
+        window.addEventListener('load', function() {
+            console.log('🔄 Page complètement chargée, vérification des rôles...');
+            const roleSelect = document.getElementById('role_name');
+            if (roleSelect && roleSelect.options.length <= 1) {
+                console.log('⚠️ Aucun rôle chargé, nouvelle tentative...');
+                loadAvailableRoles();
+            }
+        });
+
+        function initializeRegisterForm() {
+            const form = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('password');
+            
+            passwordInput.addEventListener('input', checkPasswordStrength);
+            form.addEventListener('submit', handleRegisterSubmit);
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.parentNode.querySelector('.password-toggle i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                button.className = 'fas fa-eye-slash';
+            } else {
+                field.type = 'password';
+                button.className = 'fas fa-eye';
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthContainer = document.getElementById('passwordStrength');
+            
+            let strength = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) strength++;
+            else feedback.push('Au moins 8 caractères');
+            
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('Une majuscule');
+            
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('Une minuscule');
+            
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('Un chiffre');
+            
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('Un caractère spécial');
+            
+            const levels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+            const colors = ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#16a34a'];
+            
+            strengthContainer.innerHTML = `
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: ${(strength / 5) * 100}%; background: ${colors[strength - 1] || colors[0]}"></div>
+                </div>
+                <div class="strength-text" style="color: ${colors[strength - 1] || colors[0]}">
+                    ${levels[strength - 1] || levels[0]}
+                    ${feedback.length > 0 ? ` - Manque: ${feedback.join(', ')}` : ''}
+                </div>
+            `;
+        }
+
+        async function handleRegisterSubmit(event) {
+            event.preventDefault();
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const form = event.target;
+            
+            clearAllErrors();
+            
+            const formData = new FormData(form);
+            const userData = Object.fromEntries(formData.entries());
+            
+            if (!validateRegisterForm(userData)) {
+                return;
+            }
+            
+            try {
+                console.log('📤 [DEBUG] Données envoyées:', userData);
+                showLoading(registerBtn, 'Création du compte...');
+
+                const response = await fetch('/api/backend/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                console.log('📡 [DEBUG] Réponse:', response.status, response.statusText);
+                const result = await response.json();
+                console.log('📋 [DEBUG] Résultat:', result);
+
+                if (response.ok && result.success) {
+                    showNotification('Compte créé avec succès ! Redirection...', 'success');
+
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    console.error('❌ [DEBUG] Erreur de validation:', result);
+                    showNotification(result.message || 'Erreur lors de la création du compte', 'error');
+
+                    if (result.errors) {
+                        console.error('❌ [DEBUG] Erreurs détaillées:', result.errors);
+                        Object.keys(result.errors).forEach(field => {
+                            console.error(`❌ [DEBUG] Erreur ${field}:`, result.errors[field]);
+                            showFieldError(field, result.errors[field][0]);
+                        });
+                    }
+                }
+            } catch (error) {
+                showNotification(`Erreur: ${error.message}`, 'error');
+            } finally {
+                hideLoading(registerBtn);
+            }
+        }
+
+        function validateRegisterForm(data) {
+            let isValid = true;
+            
+            if (!data.first_name) {
+                showFieldError('first_name', 'Le prénom est requis');
+                isValid = false;
+            }
+            
+            if (!data.last_name) {
+                showFieldError('last_name', 'Le nom est requis');
+                isValid = false;
+            }
+            
+            if (!data.email) {
+                showFieldError('email', 'L\'email est requis');
+                isValid = false;
+            } else if (!isValidEmail(data.email)) {
+                showFieldError('email', 'Format d\'email invalide');
+                isValid = false;
+            }
+            
+            if (!data.password) {
+                showFieldError('password', 'Le mot de passe est requis');
+                isValid = false;
+            } else if (data.password.length < 8) {
+                showFieldError('password', 'Le mot de passe doit contenir au moins 8 caractères');
+                isValid = false;
+            }
+            
+            if (data.password !== data.password_confirmation) {
+                showFieldError('password_confirmation', 'Les mots de passe ne correspondent pas');
+                isValid = false;
+            }
+            
+            if (!data.role_name) {
+                showFieldError('role_name', 'Veuillez sélectionner un rôle');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showFieldError(fieldName, message) {
+            const field = document.getElementById(fieldName);
+            const errorDiv = document.getElementById(fieldName + '-error');
+            
+            field.classList.add('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'flex';
+        }
+
+        function clearAllErrors() {
+            const errorDivs = document.querySelectorAll('.field-error');
+            const inputFields = document.querySelectorAll('.form-input, .form-select');
+            
+            errorDivs.forEach(div => {
+                div.style.display = 'none';
+                div.textContent = '';
+            });
+            
+            inputFields.forEach(field => {
+                field.classList.remove('error');
+            });
+        }
+
+        function showLoading(button, text) {
+            button.disabled = true;
+            button.classList.add('loading');
+            button.setAttribute('data-original-text', button.innerHTML);
+            button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
+        }
+
+        function hideLoading(button) {
+            button.disabled = false;
+            button.classList.remove('loading');
+            button.innerHTML = button.getAttribute('data-original-text');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const content = document.getElementById('notification-content');
+            
+            notification.className = 'notification';
+            notification.classList.add('notification-' + type);
+            
+            content.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${getNotificationIcon(type)}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            notification.style.display = 'block';
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.style.display = 'none', 300);
+            }, 5000);
+        }
+
+        function getNotificationIcon(type) {
+            switch (type) {
+                case 'success': return 'check-circle';
+                case 'error': return 'exclamation-circle';
+                case 'warning': return 'exclamation-triangle';
+                default: return 'info-circle';
+            }
+        }
+
+        // Charger les rôles disponibles depuis l'API
+        async function loadAvailableRoles() {
+            console.log('🔄 [DEBUG] Début de loadAvailableRoles()');
+
+            try {
+                console.log('🔄 [DEBUG] Appel fetch vers /api/public/roles');
+                const response = await fetch('/api/public/roles');
+                console.log('📡 [DEBUG] Réponse reçue:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    url: response.url
+                });
+
+                if (response.ok) {
+                    console.log('📡 [DEBUG] Réponse OK, parsing JSON...');
+                    const result = await response.json();
+                    console.log('📋 [DEBUG] JSON parsé:', result);
+                    console.log('📋 [DEBUG] result.success:', result.success);
+                    console.log('📋 [DEBUG] result.data:', result.data);
+                    console.log('📋 [DEBUG] Array.isArray(result.data):', Array.isArray(result.data));
+
+                    if (result.success && result.data && Array.isArray(result.data)) {
+                        console.log(`✅ [DEBUG] Conditions remplies, ${result.data.length} rôles trouvés`);
+                        console.log('🎨 [DEBUG] Appel de populateRoleSelect...');
+                        populateRoleSelect(result.data);
+                        console.log('✅ [DEBUG] populateRoleSelect terminé avec succès');
+                        return;
+                    } else {
+                        console.error('❌ [DEBUG] Conditions non remplies pour populateRoleSelect');
+                    }
+                } else {
+                    console.error('❌ [DEBUG] Réponse non OK');
+                }
+
+                console.warn('⚠️ [DEBUG] Fallback vers loadDefaultRoles');
+                loadDefaultRoles();
+
+            } catch (error) {
+                console.error('❌ [DEBUG] Exception capturée:', error);
+                loadDefaultRoles();
+            }
+        }
+
+        // Peupler le select avec les rôles
+        function populateRoleSelect(roles) {
+            console.log(`🎨 [DEBUG] DÉBUT populateRoleSelect avec ${roles.length} rôles`);
+            console.log('🎨 [DEBUG] Rôles reçus:', roles);
+
+            const roleSelect = document.getElementById('role_name');
+            console.log('🎨 [DEBUG] Élément role_name trouvé:', roleSelect);
+
+            if (!roleSelect) {
+                console.error('❌ [DEBUG] Élément role_name non trouvé !');
+                return;
+            }
+
+            console.log('🎨 [DEBUG] Vidage du select...');
+            roleSelect.innerHTML = '<option value="">Sélectionnez votre rôle</option>';
+            console.log('🎨 [DEBUG] Select vidé, options actuelles:', roleSelect.options.length);
+
+            const roleIcons = {
+                'super_admin': '👑',
+                'admin': '🔧',
+                'hr_director': '🎯',
+                'hr_manager': '👥',
+                'senior_recruiter': '⭐',
+                'recruiter': '🎯',
+                'junior_recruiter': '🌟',
+                'analyst': '📊',
+                'viewer': '👁️'
+            };
+
+            let addedRoles = 0;
+            console.log('🎨 [DEBUG] Début de la boucle forEach...');
+
+            roles.forEach((role, index) => {
+                console.log(`🎨 [DEBUG] Traitement rôle ${index + 1}/${roles.length}:`, role);
+
+                if (role.is_active) {
+                    console.log(`🎨 [DEBUG] Rôle actif, création de l'option...`);
+                    const option = document.createElement('option');
+                    option.value = role.name;
+                    const icon = roleIcons[role.name] || '👤';
+                    option.textContent = `${icon} ${role.display_name}`;
+                    option.title = role.description || '';
+                    roleSelect.appendChild(option);
+                    addedRoles++;
+                    console.log(`  ✅ [DEBUG] Rôle ajouté: ${role.name} - ${role.display_name}`);
+                } else {
+                    console.log(`  ⚠️ [DEBUG] Rôle inactif ignoré: ${role.name}`);
+                }
+            });
+
+            console.log(`✅ [DEBUG] FIN populateRoleSelect: ${addedRoles} rôles ajoutés`);
+            console.log(`✅ [DEBUG] Options finales dans le select:`, roleSelect.options.length);
+        }
+
+        // Charger les rôles par défaut en cas d'erreur
+        function loadDefaultRoles() {
+            console.log('⚠️ [DEBUG] DÉBUT loadDefaultRoles (fallback)');
+            console.log('⚠️ [DEBUG] ATTENTION: Cette fonction ne devrait PAS être appelée si l\'API fonctionne !');
+
+            const roleSelect = document.getElementById('role_name');
+            if (!roleSelect) {
+                console.error('❌ [DEBUG] Élément role_name non trouvé pour les rôles par défaut !');
+                return;
+            }
+
+            console.log('⚠️ [DEBUG] Chargement des 3 rôles par défaut...');
+            roleSelect.innerHTML = `
+                <option value="">Sélectionnez votre rôle</option>
+                <option value="admin">🔧 Administrateur (par défaut)</option>
+                <option value="hr_manager">👥 Responsable RH (par défaut)</option>
+                <option value="recruiter">🎯 Recruteur (par défaut)</option>
+            `;
+            console.log('⚠️ [DEBUG] FIN loadDefaultRoles: 3 rôles par défaut chargés');
+        }
+
+        // Fonctions de debug temporaires
+        async function testAPI() {
+            console.log('🧪 [DEBUG] Test direct de l\'API');
+            try {
+                const response = await fetch('/api/public/roles');
+                console.log('📡 [DEBUG] Réponse API:', response.status, response.statusText);
+                const data = await response.json();
+                console.log('📋 [DEBUG] Données:', data);
+                alert(`API Test: ${response.status} - ${data.success ? data.data.length + ' rôles trouvés' : 'Erreur'}`);
+            } catch (error) {
+                console.error('❌ [DEBUG] Erreur API:', error);
+                alert('Erreur API: ' + error.message);
+            }
+        }
+
+        function showSelectInfo() {
+            const roleSelect = document.getElementById('role_name');
+            if (roleSelect) {
+                console.log('📋 [DEBUG] Info du select:', {
+                    element: roleSelect,
+                    optionsCount: roleSelect.options.length,
+                    innerHTML: roleSelect.innerHTML
+                });
+                alert(`Select Info: ${roleSelect.options.length} options\n\nContenu:\n${roleSelect.innerHTML}`);
+            } else {
+                alert('Select role_name non trouvé !');
+            }
+        }
+    </script>
+</body>
+</html>

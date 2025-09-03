@@ -1,0 +1,72 @@
+# ===== FICHIERS SYSTÈME =====
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.temp
+
+# ===== ENVIRONNEMENT ET SECRETS =====
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+
+# ===== BACKEND LARAVEL =====
+example-app/vendor/
+example-app/node_modules/
+example-app/storage/logs/*.log
+example-app/storage/framework/cache/*
+example-app/storage/framework/sessions/*
+example-app/storage/framework/views/*
+example-app/storage/app/public/*
+example-app/bootstrap/cache/*.php
+example-app/.phpunit.result.cache
+example-app/Homestead.json
+example-app/Homestead.yaml
+example-app/npm-debug.log
+example-app/yarn-error.log
+
+# ===== FRONTEND ANGULAR =====
+example-app-frontend/node_modules/
+example-app-frontend/dist/
+example-app-frontend/.angular/
+example-app-frontend/.vscode/
+example-app-frontend/npm-debug.log*
+example-app-frontend/yarn-debug.log*
+example-app-frontend/yarn-error.log*
+
+# ===== DOCKER =====
+*.log
+docker-compose.override.yml
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== BASES DE DONNÉES =====
+*.sqlite
+*.db
+postgres_data/
+
+# ===== UPLOADS ET FICHIERS TEMPORAIRES =====
+uploads/
+temp/
+tmp/
+
+# ===== CERTIFICATS ET CLÉS =====
+*.crt
+*.key
+*.pem
+ssl/
+
+# ===== CACHE =====
+.cache/
+*.cache
+
+# ===== DOCUMENTATION GÉNÉRÉE =====
+docs/build/

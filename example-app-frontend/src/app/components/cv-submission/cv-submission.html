@@ -1,0 +1,213 @@
+<div class="cv-submission-container">
+  <mat-card class="submission-card hover-lift">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>work</mat-icon>
+        Soumission de Candidature
+      </mat-card-title>
+      <mat-card-subtitle>
+        Rejoignez notre équipe ! Remplissez le formulaire ci-dessous pour soumettre votre candidature et faire partie de notre aventure.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()" class="candidate-form">
+
+        <!-- Sélection de l'offre d'emploi -->
+        <div class="form-section job-offer-section">
+          <h3>🎯 Offre d'emploi</h3>
+
+          <!-- Affichage de l'offre présélectionnée -->
+          <div *ngIf="selectedJobOffer" class="selected-job-offer">
+            <div class="job-offer-card">
+              <div class="job-header">
+                <h4>{{ selectedJobOffer.title }}</h4>
+                <div class="job-badges">
+                  <span class="badge" [class]="'badge-' + selectedJobOffer.type">
+                    {{ selectedJobOffer.type === 'emploi' ? '💼 Emploi' : '🎓 Stage' }}
+                  </span>
+                  <span class="badge badge-contract">{{ getContractTypeLabel(selectedJobOffer.contract_type) }}</span>
+                </div>
+              </div>
+              <div class="job-details">
+                <p><strong>🏢 Entreprise:</strong> {{ selectedJobOffer.company_name }}</p>
+                <p><strong>📍 Localisation:</strong> {{ selectedJobOffer.location }}</p>
+                <p><strong>🎯 Niveau:</strong> {{ getExperienceLevelLabel(selectedJobOffer.experience_level) }}</p>
+                <p *ngIf="selectedJobOffer.salary_range"><strong>💰 Salaire:</strong> {{ selectedJobOffer.salary_range }}</p>
+              </div>
+              <div class="job-description">
+                <p>{{ selectedJobOffer.description | slice:0:200 }}{{ selectedJobOffer.description.length > 200 ? '...' : '' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sélecteur d'offre (toujours visible) -->
+          <div>
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Choisissez une offre d'emploi *</mat-label>
+              <mat-select formControlName="job_offer_id" (selectionChange)="onJobOfferChange($event.value)">
+                <mat-option *ngFor="let offer of jobOffers" [value]="offer.id">
+                  <div class="option-content">
+                    <div class="option-title">{{ offer.title }}</div>
+                    <div class="option-subtitle">{{ offer.company_name }} - {{ offer.location }}</div>
+                    <div class="option-badges">
+                      <span class="mini-badge" [class]="'badge-' + offer.type">{{ offer.type }}</span>
+                      <span class="mini-badge">{{ offer.contract_type }}</span>
+                    </div>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="candidateForm.get('job_offer_id')?.invalid && candidateForm.get('job_offer_id')?.touched">
+                Veuillez sélectionner une offre d'emploi
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Message si aucune offre disponible -->
+            <div *ngIf="!loadingOffers && jobOffers.length === 0" class="no-offers-message">
+              <p>❌ Aucune offre d'emploi disponible pour le moment.</p>
+              <p>Veuillez revenir plus tard ou contactez-nous directement.</p>
+            </div>
+
+            <!-- Loading des offres -->
+            <div *ngIf="loadingOffers" class="loading-offers">
+              <mat-spinner diameter="30"></mat-spinner>
+              <p>Chargement des offres d'emploi...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations personnelles -->
+        <div class="form-section">
+          <h3>Informations personnelles</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Nom *</mat-label>
+              <input matInput formControlName="nom" placeholder="Votre nom">
+              <mat-error *ngIf="candidateForm.get('nom')?.invalid && candidateForm.get('nom')?.touched">
+                {{ getErrorMessage('nom') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Prénom *</mat-label>
+              <input matInput formControlName="prenom" placeholder="Votre prénom">
+              <mat-error *ngIf="candidateForm.get('prenom')?.invalid && candidateForm.get('prenom')?.touched">
+                {{ getErrorMessage('prenom') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Email *</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="votre.email@exemple.com">
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error *ngIf="candidateForm.get('email')?.invalid && candidateForm.get('email')?.touched">
+                {{ getErrorMessage('email') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Téléphone *</mat-label>
+              <input matInput formControlName="telephone" placeholder="+33 1 23 45 67 89">
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error *ngIf="candidateForm.get('telephone')?.invalid && candidateForm.get('telephone')?.touched">
+                {{ getErrorMessage('telephone') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>LinkedIn (optionnel)</mat-label>
+            <input matInput formControlName="linkedin_url" placeholder="https://www.linkedin.com/in/votre-profil">
+            <mat-icon matSuffix>link</mat-icon>
+            <mat-error *ngIf="candidateForm.get('linkedin_url')?.invalid && candidateForm.get('linkedin_url')?.touched">
+              {{ getErrorMessage('linkedin_url') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Upload de fichiers -->
+        <div class="form-section">
+          <h3>Documents</h3>
+
+          <div class="file-upload-section">
+            <div class="file-upload-item">
+              <label for="cv-file" class="file-upload-label">
+                <mat-icon>description</mat-icon>
+                <span>CV (PDF) *</span>
+                <span class="file-info" *ngIf="cvFile">{{ cvFile.name }}</span>
+              </label>
+              <input
+                id="cv-file"
+                type="file"
+                accept=".pdf"
+                (change)="onCvFileSelected($event)"
+                class="file-input">
+              <button
+                type="button"
+                mat-stroked-button
+                (click)="document.getElementById('cv-file')?.click()"
+                class="upload-button">
+                <mat-icon>upload_file</mat-icon>
+                {{ cvFile ? 'Changer le CV' : 'Choisir le CV' }}
+              </button>
+            </div>
+
+            <div class="file-upload-item">
+              <label for="lettre-file" class="file-upload-label">
+                <mat-icon>article</mat-icon>
+                <span>Lettre de motivation (PDF) *</span>
+                <span class="file-info" *ngIf="lettreFile">{{ lettreFile.name }}</span>
+              </label>
+              <input
+                id="lettre-file"
+                type="file"
+                accept=".pdf"
+                (change)="onLettreFileSelected($event)"
+                class="file-input">
+              <button
+                type="button"
+                mat-stroked-button
+                (click)="document.getElementById('lettre-file')?.click()"
+                class="upload-button">
+                <mat-icon>upload_file</mat-icon>
+                {{ lettreFile ? 'Changer la lettre' : 'Choisir la lettre' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="file-requirements">
+            <p><mat-icon>info</mat-icon> Formats acceptés : PDF uniquement</p>
+            <p><mat-icon>info</mat-icon> Taille maximale : 5 MB par fichier</p>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            [disabled]="isSubmitting || candidateForm.invalid || !cvFile || !lettreFile"
+            class="submit-button">
+            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+            <mat-icon *ngIf="!isSubmitting">send</mat-icon>
+            {{ isSubmitting ? 'Envoi en cours...' : 'Soumettre ma candidature' }}
+          </button>
+
+          <button
+            type="button"
+            mat-button
+            (click)="resetForm()"
+            [disabled]="isSubmitting"
+            class="reset-button">
+            <mat-icon>refresh</mat-icon>
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

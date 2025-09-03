@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - CV Filtering System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="filament-style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <a href="#" class="app-logo">
+                    <i class="fas fa-filter"></i>
+                    CV Filtering System
+                </a>
+                <nav class="header-nav">
+                    <a href="register.html" class="nav-link">
+                        <i class="fas fa-user-plus"></i>
+                        Créer un compte
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <div class="auth-card card">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Connexion
+                    </h1>
+                    <p class="card-description">
+                        Accédez à votre espace de gestion des candidatures
+                    </p>
+                </div>
+
+                <div class="card-content">
+                    <form id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Adresse email
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input" 
+                                placeholder="votre.email@entreprise.com"
+                                required
+                                autocomplete="email"
+                            >
+                            <div class="field-error" id="email-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Mot de passe
+                            </label>
+                            <div class="password-field">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-input" 
+                                    placeholder="Votre mot de passe"
+                                    required
+                                    autocomplete="current-password"
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="field-error" id="password-error" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" id="loginBtn" class="btn btn-primary btn-full">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Se connecter
+                            </button>
+                        </div>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                        <p style="color: var(--gray-600); font-size: 0.875rem;">
+                            Pas encore de compte ? 
+                            <a href="register.html" style="color: var(--primary-600); text-decoration: none; font-weight: 600;">
+                                Créer un compte
+                            </a>
+                        </p>
+                        <p style="color: var(--gray-500); font-size: 0.75rem; margin-top: 1rem;">
+                            <strong>Comptes de test disponibles :</strong><br>
+                            👑 <strong>Admin:</strong> admin@test.com / password123<br>
+                            👥 <strong>HR Manager:</strong> marie.hr@test.com / password123<br>
+                            📊 <strong>Analyst:</strong> sophie.analyst@test.com / password123<br>
+                            🔍 <strong>Viewer:</strong> jean.test@example.com / password123
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2025 CV Filtering System. Interface d'administration sécurisée.</p>
+        </footer>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification" class="notification" style="display: none;">
+        <div id="notification-content"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLoginForm();
+            checkExistingAuth();
+        });
+
+        function checkExistingAuth() {
+            if (TokenManager.isAuthenticated()) {
+                window.location.href = 'profile.html';
+            }
+        }
+
+        function initializeLoginForm() {
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', handleLoginSubmit);
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.parentNode.querySelector('.password-toggle i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                button.className = 'fas fa-eye-slash';
+            } else {
+                field.type = 'password';
+                button.className = 'fas fa-eye';
+            }
+        }
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const form = event.target;
+            
+            // Nettoyer les erreurs précédentes
+            clearAllErrors();
+            
+            // Récupérer les données du formulaire
+            const formData = new FormData(form);
+            const loginData = Object.fromEntries(formData.entries());
+            
+            // Validation côté client
+            if (!validateLoginForm(loginData)) {
+                return;
+            }
+            
+            try {
+                showLoading(loginBtn, 'Connexion...');
+                
+                // Appel à l'API backend
+                const response = await fetch('/api/backend/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showNotification('Connexion réussie ! Redirection...', 'success');
+                    
+                    // Sauvegarder le token et les données utilisateur
+                    TokenManager.setToken(result.data.token);
+                    UserManager.setUser(result.data.user);
+                    
+                    // Redirection vers le dashboard après 1 seconde
+                    setTimeout(() => {
+                        window.location.href = '../dashboard.html';
+                    }, 1000);
+                } else {
+                    showNotification(result.message || 'Erreur lors de la connexion', 'error');
+                    
+                    // Afficher les erreurs de validation
+                    if (result.errors) {
+                        Object.keys(result.errors).forEach(field => {
+                            showFieldError(field, result.errors[field][0]);
+                        });
+                    }
+                }
+            } catch (error) {
+                showNotification(`Erreur: ${error.message}`, 'error');
+            } finally {
+                hideLoading(loginBtn);
+            }
+        }
+
+        function validateLoginForm(data) {
+            let isValid = true;
+            
+            // Validation de l'email
+            if (!data.email) {
+                showFieldError('email', 'L\'email est requis');
+                isValid = false;
+            } else if (!isValidEmail(data.email)) {
+                showFieldError('email', 'Format d\'email invalide');
+                isValid = false;
+            }
+            
+            // Validation du mot de passe
+            if (!data.password) {
+                showFieldError('password', 'Le mot de passe est requis');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showFieldError(fieldName, message) {
+            const field = document.getElementById(fieldName);
+            const errorDiv = document.getElementById(fieldName + '-error');
+            
+            field.classList.add('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'flex';
+        }
+
+        function clearAllErrors() {
+            const errorDivs = document.querySelectorAll('.field-error');
+            const inputFields = document.querySelectorAll('.form-input, .form-select');
+            
+            errorDivs.forEach(div => {
+                div.style.display = 'none';
+                div.textContent = '';
+            });
+            
+            inputFields.forEach(field => {
+                field.classList.remove('error');
+            });
+        }
+
+        function showLoading(button, text) {
+            button.disabled = true;
+            button.classList.add('loading');
+            button.setAttribute('data-original-text', button.innerHTML);
+            button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
+        }
+
+        function hideLoading(button) {
+            button.disabled = false;
+            button.classList.remove('loading');
+            button.innerHTML = button.getAttribute('data-original-text');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const content = document.getElementById('notification-content');
+            
+            // Nettoyer les classes précédentes
+            notification.className = 'notification';
+            notification.classList.add('notification-' + type);
+            
+            content.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${getNotificationIcon(type)}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            notification.style.display = 'block';
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto-hide après 5 secondes
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.style.display = 'none', 300);
+            }, 5000);
+        }
+
+        function getNotificationIcon(type) {
+            switch (type) {
+                case 'success': return 'check-circle';
+                case 'error': return 'exclamation-circle';
+                case 'warning': return 'exclamation-triangle';
+                default: return 'info-circle';
+            }
+        }
+
+        // Note: TokenManager et UserManager sont définis dans app.js
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<div class="job-offers-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🚀 Offres d'Emploi & Stages</h1>
+    <p>Trouvez l'opportunité qui vous correspond et postulez directement !</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <!-- Recherche -->
+      <div class="filter-group">
+        <label>🔍 Rechercher</label>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onFilterChange()"
+          placeholder="Titre, entreprise, description..."
+          class="search-input">
+      </div>
+
+      <!-- Type d'offre -->
+      <div class="filter-group">
+        <label>📋 Type</label>
+        <select [(ngModel)]="selectedType" (change)="onFilterChange()" class="filter-select">
+          <option value="all">Tous</option>
+          <option value="emploi">Emploi</option>
+          <option value="stage">Stage</option>
+        </select>
+      </div>
+
+      <!-- Localisation -->
+      <div class="filter-group">
+        <label>📍 Localisation</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedLocation"
+          (input)="onFilterChange()"
+          placeholder="Ville, région..."
+          class="filter-input">
+      </div>
+
+      <!-- Niveau d'expérience -->
+      <div class="filter-group">
+        <label>🎯 Expérience</label>
+        <select [(ngModel)]="selectedExperience" (change)="onFilterChange()" class="filter-select">
+          <option value="all">Tous niveaux</option>
+          <option value="junior">Débutant</option>
+          <option value="intermediate">Intermédiaire</option>
+          <option value="senior">Senior</option>
+          <option value="expert">Expert</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading avec message dynamique -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>{{ loadingMessage }}</p>
+    <small>⏱️ Optimisation en cours... Merci de patienter</small>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error">
+    <p>❌ {{ error }}</p>
+    <button (click)="loadJobOffers()" class="retry-btn">Réessayer</button>
+  </div>
+
+  <!-- Résultats -->
+  <div *ngIf="!loading && !error" class="results-section">
+    <div class="results-header">
+      <h2>{{ filteredOffers.length }} offre(s) trouvée(s)</h2>
+    </div>
+
+    <!-- Liste des offres -->
+    <div class="offers-grid">
+      <div *ngFor="let offer of filteredOffers" class="offer-card">
+        <!-- Header de la carte -->
+        <div class="offer-header">
+          <div class="offer-title-section">
+            <h3>{{ offer.title }}</h3>
+            <div class="offer-badges">
+              <span class="badge" [class]="'badge-' + offer.type">
+                {{ offer.type === 'emploi' ? '💼 Emploi' : '🎓 Stage' }}
+              </span>
+              <span class="badge badge-contract">{{ getContractTypeLabel(offer.contract_type) }}</span>
+              <span class="badge badge-experience">{{ getExperienceLevelLabel(offer.experience_level) }}</span>
+            </div>
+          </div>
+          <div class="company-info">
+            <h4>🏢 {{ offer.company_name }}</h4>
+            <p>📍 {{ offer.location }}</p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="offer-description">
+          <p>{{ offer.description | slice:0:200 }}{{ offer.description.length > 200 ? '...' : '' }}</p>
+        </div>
+
+        <!-- Détails -->
+        <div class="offer-details">
+          <div class="detail-item" *ngIf="offer.salary_range">
+            <strong>💰 Salaire:</strong> {{ offer.salary_range }}
+          </div>
+          <div class="detail-item">
+            <strong>👥 Postes:</strong> {{ offer.positions_available }}
+          </div>
+          <div class="detail-item" *ngIf="offer.application_deadline">
+            <strong>📅 Date limite:</strong>
+            <span [class]="isDeadlineApproaching(offer.application_deadline) ? 'deadline-warning' : ''">
+              {{ offer.application_deadline | date:'dd/MM/yyyy' }}
+            </span>
+            <span *ngIf="isDeadlineApproaching(offer.application_deadline)" class="urgent">⚠️ Urgent</span>
+          </div>
+        </div>
+
+        <!-- Compétences -->
+        <div class="skills-section" *ngIf="offer.skills_required && offer.skills_required.length > 0">
+          <strong>🎯 Compétences:</strong>
+          <div class="skills-tags">
+            <span *ngFor="let skill of offer.skills_required" class="skill-tag">{{ skill }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="offer-actions">
+          <button (click)="viewJobDetails(offer)" class="btn btn-secondary">
+            👁️ Voir détails
+          </button>
+          <button (click)="applyToJob(offer)" class="btn btn-primary">
+            📤 Postuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aucun résultat -->
+    <div *ngIf="filteredOffers.length === 0" class="no-results">
+      <div class="no-results-content">
+        <h3>🔍 Aucune offre trouvée</h3>
+        <p>Essayez de modifier vos critères de recherche.</p>
+        <button (click)="selectedType = 'all'; selectedLocation = ''; selectedExperience = 'all'; searchTerm = ''; onFilterChange()"
+                class="btn btn-secondary">
+          🔄 Réinitialiser les filtres
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les détails de l'offre -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedJobOffer">
+
+    <!-- Header du modal -->
+    <div class="modal-header">
+      <div class="modal-title-section">
+        <h2>{{ selectedJobOffer.title }}</h2>
+        <div class="modal-badges">
+          <span class="badge" [class]="'badge-' + selectedJobOffer.type">
+            {{ selectedJobOffer.type === 'emploi' ? '💼 Emploi' : '🎓 Stage' }}
+          </span>
+          <span class="badge badge-contract">{{ getContractTypeLabel(selectedJobOffer.contract_type) }}</span>
+          <span class="badge badge-experience">{{ getExperienceLevelLabel(selectedJobOffer.experience_level) }}</span>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeModal()">
+        <span>✕</span>
+      </button>
+    </div>
+
+    <!-- Contenu du modal -->
+    <div class="modal-body">
+
+      <!-- Informations entreprise -->
+      <div class="modal-section">
+        <h3>🏢 Entreprise</h3>
+        <div class="company-details">
+          <p><strong>Nom:</strong> {{ selectedJobOffer.company_name }}</p>
+          <p><strong>Localisation:</strong> {{ selectedJobOffer.location }}</p>
+        </div>
+      </div>
+
+      <!-- Description complète -->
+      <div class="modal-section">
+        <h3>📝 Description du poste</h3>
+        <div class="description-content">
+          <p>{{ selectedJobOffer.description }}</p>
+        </div>
+      </div>
+
+      <!-- Détails du poste -->
+      <div class="modal-section">
+        <h3>💼 Détails du poste</h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <strong>🎯 Niveau d'expérience:</strong>
+            <span>{{ getExperienceLevelLabel(selectedJobOffer.experience_level) }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>📋 Type de contrat:</strong>
+            <span>{{ getContractTypeLabel(selectedJobOffer.contract_type) }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedJobOffer.salary_range">
+            <strong>💰 Rémunération:</strong>
+            <span>{{ selectedJobOffer.salary_range }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedJobOffer.positions_available">
+            <strong>👥 Postes disponibles:</strong>
+            <span>{{ selectedJobOffer.positions_available }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedJobOffer.application_deadline">
+            <strong>📅 Date limite:</strong>
+            <span [class]="isDeadlineApproaching(selectedJobOffer.application_deadline) ? 'deadline-warning' : ''">
+              {{ selectedJobOffer.application_deadline | date:'dd/MM/yyyy' }}
+            </span>
+            <span *ngIf="isDeadlineApproaching(selectedJobOffer.application_deadline)" class="urgent">⚠️ Urgent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compétences requises -->
+      <div class="modal-section" *ngIf="selectedJobOffer.skills_required && selectedJobOffer.skills_required.length > 0">
+        <h3>🎯 Compétences requises</h3>
+        <div class="skills-tags">
+          <span *ngFor="let skill of selectedJobOffer.skills_required" class="skill-tag">{{ skill }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer du modal -->
+    <div class="modal-footer">
+      <button (click)="closeModal()" class="btn btn-secondary">
+        ❌ Fermer
+      </button>
+      <button (click)="applyFromModal()" class="btn btn-primary">
+        📤 Postuler maintenant
+      </button>
+    </div>
+
+  </div>
+</div>
